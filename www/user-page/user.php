@@ -42,6 +42,7 @@ $sql = "
         u.symptoms,
         u.causes,
         u.disease,
+        u.medicine,
 
         (
             SELECT COUNT(*)
@@ -66,6 +67,7 @@ if ($search !== '') {
             OR symptoms LIKE ?
             OR causes LIKE ?
             OR disease LIKE ?
+            OR medicine LIKE ?
     ";
 }
 
@@ -73,10 +75,18 @@ $sql .= " ORDER BY u.user_id ASC";
 
 $stmt = $conn->prepare($sql);
 
+$search = trim($_GET['search'] ?? '');
+
+$stmt = $conn->prepare($sql);
+
 if ($search !== '') {
     $keyword = "%{$search}%";
+
     $stmt->bind_param(
-        "ssss",
+        "sssssss",
+        $keyword,
+        $keyword,
+        $keyword,
         $keyword,
         $keyword,
         $keyword,
@@ -172,7 +182,7 @@ $stmt->close();
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0 12px 35px;
+            padding: 0 12px;
             color: white;
         }
 
@@ -555,6 +565,13 @@ $stmt->close();
             display: none;
         }
 
+        .sidebar-logo {
+            width: 200px;
+            height: 75px;
+            object-fit: contain;
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 991.98px) {
             .sidebar {
@@ -627,24 +644,19 @@ $stmt->close();
 <aside class="sidebar" id="sidebar">
 
     <a href="index.php" class="brand">
-        <div class="brand-icon">
-            <i class="fa-solid fa-heart-pulse"></i>
-        </div>
-
-        <div>
-            <h4>Medisync</h4>
-            <small>Healthcare Management</small>
-        </div>
+        <img src="../../assets/logo.svg"
+        alt="Medisync Logo"
+        class="sidebar-logo">
     </a>
 
-    <div class="menu-label">MAIN MENU</div>
+    <div class="menu-label">รายการเมนู</div>
 
     <ul class="sidebar-menu">
 
         <li>
             <a href="../index.php">
                 <i class="fa-solid fa-chart-pie"></i>
-                Dashboard
+                Home
             </a>
         </li>
 
@@ -873,6 +885,7 @@ $stmt->close();
                             <th>อาการ</th>
                             <th>สาเหตุ</th>
                             <th>โรคที่วินิจฉัย</th>
+                            <th>ยาที่แนะนำ</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -919,17 +932,21 @@ $stmt->close();
                                         <?= e($user['disease']) ?>
                                     </td>
 
+                                    <td>
+                                        <?= e($user['medicine']) ?>
+                                    </td>
+
                                     <!-- Action -->
                                     <td>
                                         <a href="edit_user.php?id=<?= urlencode($user['user_id']) ?>"
                                         class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-edit"></i> Edit
+                                            <i class="fas fa-edit"></i> แก้ไข
                                         </a>
 
                                         <a href="delete_user.php?id=<?= urlencode($user['user_id']) ?>"
                                         class="btn btn-sm btn-outline-danger"
                                         onclick="return confirm('Are you sure you want to delete this user?')">
-                                            <i class="fas fa-trash"></i> Delete
+                                            <i class="fas fa-trash"></i> ลบ
                                         </a>
                                     </td>
 

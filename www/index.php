@@ -178,7 +178,7 @@ function e($value) {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0 12px 35px;
+            padding: 0 12px;
             color: var(--white);
         }
 
@@ -566,6 +566,13 @@ function e($value) {
             display: none;
         }
 
+        .sidebar-logo {
+            width: 200px;
+            height: 75px;
+            object-fit: contain;
+            display: block;
+        }
+
         /* Responsive */
         @media (max-width: 991.98px) {
             .sidebar {
@@ -647,17 +654,12 @@ function e($value) {
 <aside class="sidebar" id="sidebar">
 
     <a href="index.php" class="brand">
-        <div class="brand-icon">
-            <i class="fa-solid fa-heart-pulse"></i>
-        </div>
-
-        <div>
-            <h4>Medisync</h4>
-            <small>Medicine Management</small>
-        </div>
+        <img src="../../assets/logo.svg"
+        alt="Medisync Logo"
+        class="sidebar-logo">
     </a>
 
-    <!-- <div class="menu-label">MAIN MENU</div> -->
+    <div class="menu-label">รายการเมนู</div>
 
     <ul class="sidebar-menu">
         <li>

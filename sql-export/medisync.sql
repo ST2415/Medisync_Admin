@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: db:3306
--- Generation Time: Oct 30, 2026 at 03:38 PM
+-- Generation Time: Oct 30, 2026 at 04:30 PM
 -- Server version: 8.0.46
 -- PHP Version: 8.3.26
 
@@ -28,7 +28,7 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `appointments` (
-  `appointment_id` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `appointment_id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
@@ -1411,7 +1411,7 @@ INSERT INTO `medicines` (`tpu_code`, `active_ingredient`, `strength`, `dosagefor
 --
 
 CREATE TABLE `schedules` (
-  `schedule_id` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `schedule_id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int NOT NULL,
   `tpu_code` int NOT NULL,
   `time_to_take` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
