@@ -2,10 +2,10 @@
 -- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Host: mysql:3306
--- Generation Time: Oct 28, 2026 at 04:06 PM
+-- Host: db:3306
+-- Generation Time: Oct 30, 2026 at 03:38 PM
 -- Server version: 8.0.46
--- PHP Version: 8.3.33
+-- PHP Version: 8.3.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,11 +28,11 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `appointments` (
-  `appointment_id` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `appointment_id` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int NOT NULL,
   `appointment_date` date NOT NULL,
   `appointment_time` time NOT NULL,
-  `status` varchar(25) COLLATE utf8mb4_unicode_ci NOT NULL
+  `status` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -345,11 +345,11 @@ INSERT INTO `appointments` (`appointment_id`, `user_id`, `appointment_date`, `ap
 --
 
 CREATE TABLE `medication_log` (
-  `log_id` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `schedule_id` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `log_id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `schedule_id` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `action_time` datetime NOT NULL,
   `status` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `side_effect` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `side_effect` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1339,10 +1339,10 @@ CREATE TABLE `medicines` (
   `strength` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `dosageform` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `trade_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `indications` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `side_effects` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `precautions` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `image_url` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `indications` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `side_effects` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `precautions` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `image_url` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1350,27 +1350,27 @@ CREATE TABLE `medicines` (
 --
 
 INSERT INTO `medicines` (`tpu_code`, `active_ingredient`, `strength`, `dosageform`, `trade_name`, `indications`, `side_effects`, `precautions`, `image_url`) VALUES
-(100005, 'alginic acid + dried aluminium hydroxide gel + magnesium carbonate', '200 mg + 30 mg + 40 mg', 'chewable tablet', 'ALGYCON', 'ยาลดกรด บรรเทาอาการกรดไหลย้อน', 'ท้องอืด, เรอ', 'เคี้ยวให้ละเอียดก่อนกลืน', 'https://gcs-global.buymed.com/thuocsi-live/images/2024a9d7dbee52a530fe216b924a7cc4?width=600'),
-(106949, 'aspirin + clopidogrel', '75 mg + 75 mg', 'film-coated tablet', 'COPLAVIX', 'ยาต้านเกล็ดเลือด ป้องกันลิ่มเลือดอุดตัน', 'จ้ำเลือด, เลือดออกง่าย', 'ระวังการเกิดบาดแผลรุนแรง', 'https://cshpharmacy.com.pk/cdn/shop/files/COPLAVIX75MG-75MGTAB-CSHPHARMACY.jpg?v=1761027359'),
+(100005, 'alginic acid + dried aluminium hydroxide gel + magnesium carbonate', '200 mg + 30 mg + 40 mg', 'chewable tablet', 'ALGYCON', 'ยาลดกรด บรรเทาอาการกรดไหลย้อน', 'เรอ', 'เคี้ยวให้ละเอียดก่อนกลืน', 'https://gcs-global.buymed.com/thuocsi-live/images/2024a9d7dbee52a530fe216b924a7cc4?width=600'),
+(106949, 'aspirin + clopidogrel', '75 mg + 75 mg', 'film-coated tablet', 'COPLAVIX', 'ยาต้านเกล็ดเลือด ป้องกันลิ่มเลือดอุดตัน', 'เลือดออกง่าย', 'ระวังการเกิดบาดแผลรุนแรง', 'https://cshpharmacy.com.pk/cdn/shop/files/COPLAVIX75MG-75MGTAB-CSHPHARMACY.jpg?v=1761027359'),
 (107229, 'eptifibatide', '75 mg/100 mL', 'solution for infusion', 'INTEGRILIN', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBJlYzXriRVfxsr5A5NCMPXGIjco639j5BkoCS6EcaJTu81r7sqEY470w&s=10'),
 (107904, 'ticlopidine hydrochloride', '250 mg', 'capsule, hard', 'CARPOV', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', ''),
-(108429, 'amlodipine', '2.5 mg', 'film-coated tablet', 'AMLODIPINE', 'รักษาความดันโลหิตสูง', 'ขาบวม, เวียนศีรษะ', 'ห้ามใช้ในสตรีมีครรภ์', 'https://www.intimolife.com/files/pv2-amlopine-4.webp'),
+(108429, 'amlodipine', '2.5 mg', 'film-coated tablet', 'AMLODIPINE', 'รักษาความดันโลหิตสูง', 'ขาบวม', 'ห้ามใช้ในสตรีมีครรภ์', 'https://www.intimolife.com/files/pv2-amlopine-4.webp'),
 (110174, 'nifedipine', '10 mg', 'prolonged-release tablet', 'NIFEDI-DENK 10 RETARD', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRH0vwV1T3x4VEUNes7DkCB5-X4F66ryqqkxV5zHqnov7tkIb2c2aHsfcI&s=10'),
 (113378, 'ramipril', '1.25 mg', 'capsule, hard', 'CORPRIL 1.25', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://www.rosheta.com/upload/3b9a846d32df0be2f65fc2aa172c87cb7219381c5859f3804698093fb280bcaf.webp'),
-(114917, 'atorvastatin', '40 mg', 'film-coated tablet', 'ATORSAN', 'ยาลดไขมันในเลือด', 'ปวดกล้ามเนื้อ, ท้องอืด', 'หลีกเลี่ยงการดื่มแอลกอฮอล์', 'https://innovation.bb.go.th/image/03010279-988611.jpg'),
-(116216, 'gemfibrozil', '300 mg', 'capsule, hard', 'CHLORESTROL (GFB-300)', 'ยาลดไขมันในเลือด', 'ปวดท้อง, คลื่นไส้', 'ระวังโรคตับ', 'https://tmanpharmaceutical.com/wp-content/uploads/2024/01/20220227_AW_Packshot_Product-list_1390x900px_Delipid-%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%A5%E0%B8%9B%E0%B8%B4%E0%B8%94.jpg'),
+(114917, 'atorvastatin', '40 mg', 'film-coated tablet', 'ATORSAN', 'ยาลดไขมันในเลือด', 'ปวดกล้ามเนื้อ', 'หลีกเลี่ยงการดื่มแอลกอฮอล์', 'https://innovation.bb.go.th/image/03010279-988611.jpg'),
+(116216, 'gemfibrozil', '300 mg', 'capsule, hard', 'CHLORESTROL (GFB-300)', 'ยาลดไขมันในเลือด', 'ปวดท้อง', 'ระวังโรคตับ', 'https://tmanpharmaceutical.com/wp-content/uploads/2024/01/20220227_AW_Packshot_Product-list_1390x900px_Delipid-%E0%B8%94%E0%B8%B5%E0%B9%84%E0%B8%A5%E0%B8%9B%E0%B8%B4%E0%B8%94.jpg'),
 (118238, 'diclofenac potassium', '50 mg', 'coated tablet', 'CATAFLAM', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://rdspharm.com/wp-content/uploads/2024/12/2230.jpg'),
 (121521, 'glucosamine sulfate', '500 mg', 'capsule, hard', 'GLUCOTRIL', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://image.makewebeasy.net/makeweb/0/VaejmKzLQ/DefaultData/%E0%B9%82%E0%B8%9B%E0%B8%A3%E0%B9%82%E0%B8%A1%E0%B8%8A%E0%B8%B1%E0%B9%88%E0%B8%99_%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87%E0%B8%A3%E0%B8%B9%E0%B8%9B%E0%B9%80%E0%B8%A7%E0%B9%87%E0%B8%9A%E0%B9%84%E0%B8%8B%E0%B8%95%E0%B9%8C__24_.png?v=202405291424'),
-(122331, 'ibuprofen', '200 mg', 'coated tablet', 'ADVIL', 'ยาแก้ปวด ลดการอักเสบ', 'ปวดท้อง, แสบร้อนกลางอก', 'ทานหลังอาหารทันที ระวังในผู้ป่วยโรคกระเพาะ', 'https://inwfile.com/s-cy/0lsdla.jpg'),
-(125072, 'ibuprofen', '200 mg', 'film-coated tablet', 'PEROFEN 200', 'ยาแก้ปวด ลดการอักเสบ', 'ปวดท้อง, แสบร้อนกลางอก', 'ทานหลังอาหารทันที ระวังในผู้ป่วยโรคกระเพาะ', 'https://tmanpharmaceutical.com/wp-content/uploads/2024/01/206A1A1.jpg'),
+(122331, 'ibuprofen', '200 mg', 'coated tablet', 'ADVIL', 'ยาแก้ปวด ลดการอักเสบ', 'ปวดท้อง', 'ทานหลังอาหารทันที ระวังในผู้ป่วยโรคกระเพาะ', 'https://inwfile.com/s-cy/0lsdla.jpg'),
+(125072, 'ibuprofen', '200 mg', 'film-coated tablet', 'PEROFEN 200', 'ยาแก้ปวด ลดการอักเสบ', 'ปวดท้อง', 'ทานหลังอาหารทันที ระวังในผู้ป่วยโรคกระเพาะ', 'https://tmanpharmaceutical.com/wp-content/uploads/2024/01/206A1A1.jpg'),
 (127124, 'ibuprofen + paracetamol', '200 mg + 325 mg', 'tablet', 'ALAXAN PI', 'ยาแก้ปวด ลดไข้', 'ไม่ค่อยพบหากใช้ในขนาดปกติ', 'ระวังพิษต่อตับ ไม่ควรทานเกิน 4 กรัมต่อวัน', 'https://mymedicine.com.mm/web/image/product.product/1273/image_1920?unique=83c12d5'),
 (226505, 'amoxicillin', '500 mg', 'capsule, hard', 'A MOXI T.O. 500', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://thaishopwholesale.com/cdn/shop/files/2024190dbe3375adc81ceae7d5a4803b.webp?v=1779722795&width=1445'),
 (229879, 'isotretinoin', '10 mg', 'capsule, soft', 'ACNOTIN 10', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://agent-skin.com/wp-content/uploads/2025/12/acnotin-10mg-1.webp'),
 (233761, 'cetirizine hydrochloride', '10 mg', 'film-coated tablet', 'ALEREST', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfZKEzks32KnfKh-lyk6EVsqVn6zWFc_818omR2xyU3Lhs3TX--sHjoGio&s=10'),
 (235544, 'salbutamol + theophylline', '2 mg + 60 mg', 'tablet', 'ALMASAL', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://gcs-global.buymed.com/thuocsi-live/images/202352a451b6933f531503ff857a8c7a?width=600'),
-(252102, 'aspirin', '65 mg', 'tablet', 'ASPIRIN', 'ยาต้านเกล็ดเลือด ป้องกันโรคหัวใจ', 'ระคายเคืองกระเพาะอาหาร, เลือดออกง่าย', 'ทานหลังอาหารทันที ห้ามทานตอนท้องว่าง', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_YRV7YcE-Ni1H3D37NZWr4g5kMGIBr5KlOhiAg6A0xz0aKQaC_3PS_Q&s=10'),
+(252102, 'aspirin', '65 mg', 'tablet', 'ASPIRIN', 'ยาต้านเกล็ดเลือด ป้องกันโรคหัวใจ', 'ระคายเคืองกระเพาะอาหาร', 'ทานหลังอาหารทันที ห้ามทานตอนท้องว่าง', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_YRV7YcE-Ni1H3D37NZWr4g5kMGIBr5KlOhiAg6A0xz0aKQaC_3PS_Q&s=10'),
 (266521, 'dimenhydrinate', '50 mg', 'tablet', 'BOOTS DIMENHYDRINATE', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://rdspharm.com/wp-content/uploads/2024/11/1923.jpg'),
-(328482, 'furosemide', '40 mg', 'tablet', 'FLUIDSEMIDE', 'ยาขับปัสสาวะ ลดอาการบวม', 'ปัสสาวะบ่อย, กระหายน้ำ', 'ระวังภาวะขาดน้ำและเกลือแร่', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4B3vY5ckoGkIWtpNciskxTQPHJkgNdxo0W9a-WcKjZRwMRTeQP9yCyOjp&s=10'),
+(328482, 'furosemide', '40 mg', 'tablet', 'FLUIDSEMIDE', 'ยาขับปัสสาวะ ลดอาการบวม', 'ปัสสาวะบ่อย', 'ระวังภาวะขาดน้ำและเกลือแร่', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT4B3vY5ckoGkIWtpNciskxTQPHJkgNdxo0W9a-WcKjZRwMRTeQP9yCyOjp&s=10'),
 (345564, 'levonorgestrel', '30 mcg', 'coated tablet', 'HYAN', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://ratutid9pharmacy.com/wp-content/uploads/2025/05/%E0%B9%84%E0%B8%AE%E0%B9%81%E0%B8%81%E0%B8%99-10%E0%B9%80%E0%B8%A1%E0%B9%87%E0%B8%94-Higan-%E0%B8%81%E0%B8%A5-1.webp'),
 (355721, 'clindamycin', '150 mg', 'capsule, hard', 'KLINDA RX', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSeXOsO__8i3P0EGIKHM-VjOz3-dnebtEjIZcmu-H2mWw0TwmrwK4hS8fk&s=10'),
 (411653, 'minoxidil', '5 mg', 'tablet', 'PIPMINOX 5', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://inwfile.com/s-ft/n0cpxk.jpg'),
@@ -1380,7 +1380,7 @@ INSERT INTO `medicines` (`tpu_code`, `active_ingredient`, `strength`, `dosagefor
 (579305, 'benzylpenicillin procaine + benzylpenicillin sodium + streptomycin', '300000 u + 100000 u + 500 mg', 'powder for solution for injection', 'PENOSEP', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', ''),
 (603006, 'ammonium chloride + chlorphenamine maleate', '100 mg/5 mL + 1.25 mg/5 mL', 'syrup', 'BABY COUGH WITH ANTIHISTAMINE', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://images.ctfassets.net/wenks87v3mfk/29zMNK8Ej83KHD5iugZgzR/228b4185500b4633e569dea82ac4d80f/ben_062600961709_beny_peds_cough_nt_100ml_fra-fr-ca'),
 (637486, 'sulfamethoxazole + trimethoprim', '200 mg/5 mL + 40 mg/5 mL', 'oral suspension', 'MOXACO', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOuv3EhgA65jtrL3rLL-rfR4o_OapzIy9C22g3jzfxzY8Z-rYRnKQjnPsK&s=10'),
-(645697, 'levothyroxine sodium', '100 mcg', 'tablet', 'ELTROXIN', 'รักษาภาวะขาดฮอร์โมนไทรอยด์', 'ใจสั่น, น้ำหนักลด, ร้อนวูบวาบ', 'ทานตอนท้องว่างก่อนอาหารเช้า', 'https://kuludonline.com/cdn/shop/files/22297_d27eac8c-c30f-471f-8755-c8d2e9031541.jpg?v=1746714225'),
+(645697, 'levothyroxine sodium', '100 mcg', 'tablet', 'ELTROXIN', 'รักษาภาวะขาดฮอร์โมนไทรอยด์', 'ใจสั่น', 'ทานตอนท้องว่างก่อนอาหารเช้า', 'https://kuludonline.com/cdn/shop/files/22297_d27eac8c-c30f-471f-8755-c8d2e9031541.jpg?v=1746714225'),
 (646963, 'sumatriptan', '50 mg', 'film-coated tablet', 'IMIGRAN', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://www.medicinemarketplace.com/wp-content/uploads/2025/11/Imigran-50mg-Tablets.jpg'),
 (652257, 'sertraline', '50 mg', 'film-coated tablet', 'ZOLOFT', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://medimedix.com/wp-content/uploads/2025/12/zoloft-50mg-30-tablets.jpg'),
 (666847, 'compound cardamom tincture + strong capsicum tincture + strong ginger tincture', '1.8 mL/15 mL + 60 mcL/15 mL + 24 mcL/15 mL', 'oral solution', 'MIXT. CARMINATIVE', 'บรรเทาอาการของโรค', 'ผลข้างเคียงทั่วไป', 'ปรึกษาแพทย์และเภสัชกรก่อนใช้', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdHJ1N1tdS43gXRsflzMwa4agEWCV_C_BIf4_kW-a3QSiM9AVL3TMTUjvc&s=10'),
@@ -1411,10 +1411,10 @@ INSERT INTO `medicines` (`tpu_code`, `active_ingredient`, `strength`, `dosagefor
 --
 
 CREATE TABLE `schedules` (
-  `schedule_id` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `schedule_id` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_id` int NOT NULL,
   `tpu_code` int NOT NULL,
-  `time_to_take` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `time_to_take` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `dosage_amount` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1553,13 +1553,13 @@ INSERT INTO `schedules` (`schedule_id`, `user_id`, `tpu_code`, `time_to_take`, `
 
 CREATE TABLE `users` (
   `user_id` int NOT NULL,
-  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `date_of_birth` date NOT NULL,
-  `gender` varchar(6) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `symptoms` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `causes` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `disease` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `medicine` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+  `gender` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `symptoms` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `causes` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `disease` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `medicine` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
