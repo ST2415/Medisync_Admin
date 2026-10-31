@@ -1248,6 +1248,106 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                 padding: 20px 18px;
             }
         }
+
+        /* Floating White Toast Notification */
+        .floating-white-toast {
+            position: fixed;
+            top: 24px;
+            right: 28px;
+            z-index: 99999;
+            min-width: 320px;
+            max-width: 440px;
+            background: #ffffff !important;
+            border-radius: 16px;
+            box-shadow: 0 16px 40px rgba(41, 69, 73, 0.22), 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(74, 128, 126, 0.25);
+            border-left: 6px solid #198754;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: toastFloatSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .floating-white-toast.toast-update {
+            border-left-color: #4A807E;
+        }
+
+        .floating-white-toast.toast-delete {
+            border-left-color: #dc3545;
+        }
+
+        .toast-icon-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: rgba(25, 135, 84, 0.12);
+            color: #198754;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .floating-white-toast.toast-update .toast-icon-circle {
+            background: rgba(74, 128, 126, 0.15);
+            color: #4A807E;
+        }
+
+        .floating-white-toast.toast-delete .toast-icon-circle {
+            background: rgba(220, 53, 69, 0.12);
+            color: #dc3545;
+        }
+
+        .toast-content-text {
+            flex: 1;
+        }
+
+        .toast-headline {
+            font-size: 14px;
+            font-weight: 700;
+            color: #294549;
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+
+        .toast-subline {
+            font-size: 12.5px;
+            color: #537478;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .toast-close-btn {
+            background: transparent;
+            border: none;
+            color: #8da4a7;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .toast-close-btn:hover {
+            color: #294549;
+            background: rgba(74, 128, 126, 0.12);
+        }
+
+        @keyframes toastFloatSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-24px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -1366,6 +1466,59 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
 
     <!-- Page Content -->
     <div class="content-wrapper">
+
+        <!-- Floating Flash Toast Notification (White Background & Floating Drop Shadow) -->
+        <?php if (isset($_GET['msg'])): ?>
+            <?php
+            $msgType = $_GET['msg'];
+            $toastTheme = '';
+            $toastIcon = 'fa-circle-check';
+            $toastTitle = 'ทำรายการสำเร็จ';
+            $toastText = '';
+
+            if ($msgType === 'added' || $msgType === 'New record created successfully') {
+                $toastText = 'เพิ่มข้อมูลใหม่เข้าสู่ระบบเรียบร้อยแล้ว';
+            } elseif ($msgType === 'updated' || $msgType === 'Data Updated successfully') {
+                $toastTheme = 'toast-update';
+                $toastIcon = 'fa-pen-to-square';
+                $toastTitle = 'อัปเดตข้อมูลสำเร็จ';
+                $toastText = 'บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว';
+            } elseif ($msgType === 'deleted' || $msgType === 'Record Delete Successfully') {
+                $toastTheme = 'toast-delete';
+                $toastIcon = 'fa-trash-can';
+                $toastTitle = 'ลบข้อมูลสำเร็จ';
+                $toastText = 'ลบข้อมูลออกจากระบบเรียบร้อยแล้ว';
+            } else {
+                $toastText = htmlspecialchars($msgType);
+            }
+            ?>
+            <?php if ($toastText !== ''): ?>
+                <div class="floating-white-toast <?= $toastTheme ?>" id="floatingToastAlert">
+                    <div class="toast-icon-circle">
+                        <i class="fa-solid <?= $toastIcon ?>"></i>
+                    </div>
+                    <div class="toast-content-text">
+                        <div class="toast-headline"><?= $toastTitle ?></div>
+                        <div class="toast-subline"><?= $toastText ?></div>
+                    </div>
+                    <button type="button" class="toast-close-btn" onclick="dismissToastAlert()" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <script>
+                    function dismissToastAlert() {
+                        const toast = document.getElementById('floatingToastAlert');
+                        if (toast) {
+                            toast.style.transition = 'all 0.3s ease';
+                            toast.style.opacity = '0';
+                            toast.style.transform = 'translateY(-20px) scale(0.95)';
+                            setTimeout(() => toast.remove(), 300);
+                        }
+                    }
+                    setTimeout(dismissToastAlert, 4500);
+                </script>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <?php if (!$user): ?>
             <!-- กรณีไม่พบข้อมูลผู้ใช้ -->
@@ -1603,6 +1756,13 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                         </a>
                                     <?php endif; ?>
                                 </div>
+
+                                <div class="ms-auto">
+                                    <a href="schedule-page/add-schedule.php?user_id=<?= urlencode($userId) ?>" style="background: var(--color-teal); color: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>เพิ่มตารางยา</span>
+                                    </a>
+                                </div>
                             </form>
                         </div>
 
@@ -1640,6 +1800,9 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                                 </div>
 
                                                 <!-- Trade Name and Active Ingredient -->
+                                                <div class="mb-1" style="font-size: 11.5px; font-weight: 600; color: var(--color-secondary);">
+                                                    <i class="fa-solid fa-capsules me-1" style="color: var(--color-teal);"></i>ชื่อยา:
+                                                </div>
                                                 <div class="med-trade-name">
                                                     <i class="fa-solid fa-prescription-bottle" style="color: var(--color-teal);"></i>
                                                     <?= !empty($sched['trade_name']) ? e($sched['trade_name']) : 'รหัสยา #' . e($sched['tpu_code']) ?>
@@ -1673,8 +1836,21 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
 
                                             <!-- Footer Info -->
                                             <div class="schedule-card-footer">
-                                                <span>รหัสตาราง: <strong><?= e($sched['schedule_id']) ?></strong></span>
-                                                <span>TPU: #<?= e($sched['tpu_code']) ?></span>
+                                                <div>
+                                                    <span>รหัส: <strong><?= e($sched['schedule_id']) ?></strong></span>
+                                                    <span class="ms-2">TPU: #<?= e($sched['tpu_code']) ?></span>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <a href="medication-log-page/add-medication-log.php?schedule_id=<?= urlencode($sched['schedule_id']) ?>&user_id=<?= urlencode($userId) ?>" class="btn btn-sm" style="background: rgba(25, 135, 84, 0.12); color: #198754; padding: 3px 8px; font-size: 11.5px; border-radius: 6px;" title="บันทึกการกินยานี้">
+                                                        <i class="fa-solid fa-notes-medical"></i>
+                                                    </a>
+                                                    <a href="schedule-page/edit-schedule.php?schedule_id=<?= urlencode($sched['schedule_id']) ?>&user_id=<?= urlencode($userId) ?>" class="btn btn-sm" style="background: rgba(78, 127, 144, 0.15); color: var(--color-primary); padding: 3px 8px; font-size: 11.5px; border-radius: 6px;" title="แก้ไขตารางยา">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </a>
+                                                    <a href="schedule-page/delete-schedule.php?id=<?= urlencode($sched['schedule_id']) ?>&user_id=<?= urlencode($userId) ?>" class="btn btn-sm" style="background: rgba(220, 53, 69, 0.12); color: #dc3545; padding: 3px 8px; font-size: 11.5px; border-radius: 6px;" onclick="return confirm('คุณแน่ใจว่าต้องการลบตารางเวลานี้หรือไม่?');" title="ลบตารางยา">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </a>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1772,6 +1948,13 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                         </a>
                                     <?php endif; ?>
                                 </div>
+
+                                <div class="ms-auto">
+                                    <a href="medication-log-page/add-medication-log.php?user_id=<?= urlencode($userId) ?>" style="background: var(--color-teal); color: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);">
+                                        <i class="fa-solid fa-plus"></i>
+                                        <span>บันทึกการกินยา</span>
+                                    </a>
+                                </div>
                             </form>
                         </div>
 
@@ -1788,6 +1971,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                             <th>สถานะการทานยา</th>
                                             <th>อาการข้างเคียงที่พบ</th>
                                             <th>รหัสตาราง</th>
+                                            <th class="text-center" style="width: 90px;">จัดการ</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -1864,6 +2048,18 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                                     <span class="text-muted" style="font-size: 11px;">
                                                         <?= e($log['schedule_id']) ?>
                                                     </span>
+                                                </td>
+
+                                                <!-- Actions -->
+                                                <td class="text-center">
+                                                    <div class="d-flex gap-1 justify-content-center">
+                                                        <a href="medication-log-page/edit-medication-log.php?log_id=<?= urlencode($log['log_id']) ?>&user_id=<?= urlencode($userId) ?>" class="btn btn-sm" style="background: rgba(78, 127, 144, 0.15); color: var(--color-primary); padding: 3px 8px; font-size: 11px; border-radius: 6px;" title="แก้ไขบันทึก">
+                                                            <i class="fa-solid fa-pen-to-square"></i>
+                                                        </a>
+                                                        <a href="medication-log-page/delete-medication-log.php?id=<?= urlencode($log['log_id']) ?>&user_id=<?= urlencode($userId) ?>" class="btn btn-sm" style="background: rgba(220, 53, 69, 0.12); color: #dc3545; padding: 3px 8px; font-size: 11px; border-radius: 6px;" onclick="return confirm('คุณแน่ใจว่าต้องการลบบันทึกนี้หรือไม่?');" title="ลบบันทึก">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
