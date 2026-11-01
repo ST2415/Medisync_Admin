@@ -31,7 +31,6 @@ function countRecords($conn, $table) {
 // ดึงจำนวนข้อมูลจริง
 $totalUsers = countRecords($conn, 'users');
 $totalMedicines = countRecords($conn, 'medicines');
-$totalLogs = countRecords($conn, 'medication_log');
 $totalAppointments = countRecords($conn, 'appointments');
 
 // ข้อมูลสำหรับ Summary Cards โดยใช้สีตาม Palette ที่กำหนด
@@ -40,41 +39,33 @@ $stats = [
         "title" => "ผู้ใช้งานทั้งหมด",
         "en_title" => "Total Users",
         "value" => number_format($totalUsers),
-        "icon" => "fa-hospital-user",
+        "icon" => "fa-users",
         "color" => "#294549",
         "bg_soft" => "rgba(41, 69, 73, 0.12)",
-        "badge" => "ผู้ป่วยและสมาชิก",
+        "desc_icon" => "fa-user-check",
+        "desc_text" => "ลงทะเบียนในระบบแล้ว",
         "link" => "user-page/user.php"
     ],
     [
         "title" => "รายการยาทั้งหมด",
         "en_title" => "Total Medicines",
         "value" => number_format($totalMedicines),
-        "icon" => "fa-pills",
+        "icon" => "fa-prescription-bottle",
         "color" => "#4E7F90",
         "bg_soft" => "rgba(78, 127, 144, 0.14)",
-        "badge" => "เวชภัณฑ์ในคลัง",
+        "desc_icon" => "fa-check-double",
+        "desc_text" => "ลงทะเบียนในคลังยาแล้ว",
         "link" => "medicine-page/medicine.php"
-    ],
-    [
-        "title" => "บันทึกการทานยา",
-        "en_title" => "Medication Logs",
-        "value" => number_format($totalLogs),
-        "icon" => "fa-clipboard-check",
-        "color" => "#4A807E",
-        "bg_soft" => "rgba(74, 128, 126, 0.14)",
-        "badge" => "ประวัติรับประทานยา",
-        "link" => "medication-log-page/medication-log.php"
     ],
     [
         "title" => "รายการนัดหมาย",
         "en_title" => "Appointments",
         "value" => number_format($totalAppointments),
         "icon" => "fa-calendar-check",
-        "color" => "#294549",
-        "accent" => "#90C2B7",
-        "bg_soft" => "rgba(144, 194, 183, 0.28)",
-        "badge" => "ตารางพบแพทย์",
+        "color" => "#4A807E",
+        "bg_soft" => "rgba(74, 128, 126, 0.14)",
+        "desc_icon" => "fa-list-ol",
+        "desc_text" => "รายการในระบบ",
         "link" => "appointment-page/appointment.php"
     ],
 ];
@@ -83,7 +74,9 @@ $stats = [
 $sql = "
     SELECT
         a.appointment_id,
+        a.user_id,
         u.name AS user_name,
+        u.gender,
         a.appointment_date,
         a.appointment_time,
         a.status
@@ -103,7 +96,9 @@ if ($result) {
     while ($row = $result->fetch_assoc()) {
         $recentAppointments[] = [
             "id" => $row['appointment_id'],
+            "user_id" => $row['user_id'],
             "name" => $row['user_name'] ?? 'ไม่ระบุชื่อ',
+            "gender" => $row['gender'] ?? '-',
             "date" => $row['appointment_date'],
             "time" => $row['appointment_time'],
             "status" => $row['status']
@@ -588,72 +583,62 @@ function e($value) {
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 14px 30px rgba(41, 69, 73, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(41, 69, 73, 0.12);
             border-color: var(--color-teal);
         }
 
-        .stat-header {
+        .stat-top {
             display: flex;
-            align-items: flex-start;
             justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 16px;
+            align-items: flex-start;
+            margin-bottom: 14px;
         }
 
-        .stat-titles h6 {
-            font-size: 14.5px;
-            font-weight: 600;
+        .stat-label-group h6 {
+            font-size: 13.5px;
+            font-weight: 700;
             color: var(--color-primary);
             margin: 0;
         }
 
-        .stat-titles small {
-            font-size: 11px;
+        .stat-label-group small {
+            font-size: 11.5px;
             color: var(--text-muted);
-            display: block;
-            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .stat-icon-wrapper {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 21px;
+            font-size: 18px;
             flex-shrink: 0;
             transition: transform 0.25s ease;
         }
 
-        .stat-card:hover .stat-icon-wrapper {
+        .stat-card:hover .stat-icon {
             transform: scale(1.08) rotate(4deg);
         }
 
-        .stat-body {
-            margin-top: auto;
-        }
-
-        .stat-number {
+        .stat-value {
             font-size: 32px;
             font-weight: 700;
             color: var(--color-primary);
-            line-height: 1.15;
+            line-height: 1.1;
             margin-bottom: 8px;
-            letter-spacing: -0.5px;
         }
 
-        .stat-badge {
-            display: inline-flex;
+        .stat-description {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 11.5px;
-            color: var(--color-teal);
-            font-weight: 500;
-            background: rgba(74, 128, 126, 0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
         }
 
         /* ===== CONTENT PANELS ===== */
@@ -762,13 +747,15 @@ function e($value) {
         }
 
         .id-badge {
-            font-weight: 600;
-            color: var(--color-secondary);
-            background: rgba(78, 127, 144, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
+            color: var(--color-primary);
+            font-weight: 700;
+            background: rgba(78, 127, 144, 0.14);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
             display: inline-block;
+            font-family: monospace;
+            border: 1px solid rgba(78, 127, 144, 0.25);
         }
 
         .patient-cell {
@@ -778,21 +765,35 @@ function e($value) {
         }
 
         .patient-avatar-mini {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: rgba(144, 194, 183, 0.35);
-            color: var(--color-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
-            font-weight: 600;
+            flex-shrink: 0;
+            background: rgba(144, 194, 183, 0.3);
+            color: var(--color-primary);
+            border: 1px solid rgba(144, 194, 183, 0.6);
+        }
+
+        .patient-avatar-mini.male {
+            background: rgba(78, 127, 144, 0.2);
+            color: #294549;
+            border: 1px solid rgba(78, 127, 144, 0.4);
+        }
+
+        .patient-avatar-mini.female {
+            background: rgba(144, 194, 183, 0.3);
+            color: #175249;
+            border: 1px solid rgba(144, 194, 183, 0.6);
         }
 
         .patient-name-text {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--color-primary);
+            font-size: 13px;
         }
 
         /* Status Badges */
@@ -802,7 +803,7 @@ function e($value) {
             gap: 6px;
             padding: 5px 12px;
             border-radius: 20px;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 600;
             white-space: nowrap;
         }
@@ -814,9 +815,9 @@ function e($value) {
         }
 
         .status-pending {
-            background: #FFF3CD;
-            color: #856404;
-            border: 1px solid #FFEEBA;
+            background: rgba(243, 156, 18, 0.15);
+            color: #d35400;
+            border: 1px solid rgba(243, 156, 18, 0.3);
         }
 
         .status-rescheduled {
@@ -1179,27 +1180,25 @@ function e($value) {
         <!-- Summary Cards Grid -->
         <section class="row g-3 mb-4">
             <?php foreach ($stats as $stat): ?>
-                <div class="col-12 col-sm-6 col-xl-3">
-                    <a href="<?= e($stat['link']) ?>" class="stat-card-link">
+                <div class="col-12 col-md-4">
+                    <a href="<?= e($stat['link']) ?>" class="stat-card-link text-decoration-none">
                         <div class="stat-card" style="--stat-theme-color: <?= e($stat['color']) ?>;">
-                            <div class="stat-header">
-                                <div class="stat-titles">
+                            <div class="stat-top">
+                                <div class="stat-label-group">
                                     <h6><?= e($stat['title']) ?></h6>
                                     <small><?= e($stat['en_title']) ?></small>
                                 </div>
-                                <div class="stat-icon-wrapper" style="background: <?= e($stat['bg_soft']) ?>; color: <?= e($stat['color']) ?>;">
+                                <div class="stat-icon" style="background: <?= e($stat['bg_soft']) ?>; color: <?= e($stat['color']) ?>;">
                                     <i class="fa-solid <?= e($stat['icon']) ?>"></i>
                                 </div>
                             </div>
 
-                            <div class="stat-body">
-                                <div class="stat-number">
-                                    <?= e($stat['value']) ?>
-                                </div>
-                                <div class="stat-badge">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                    <span><?= e($stat['badge']) ?></span>
-                                </div>
+                            <div class="stat-value">
+                                <?= e($stat['value']) ?>
+                            </div>
+                            <div class="stat-description">
+                                <i class="fa-solid <?= e($stat['desc_icon']) ?>"></i>
+                                <span><?= e($stat['desc_text']) ?></span>
                             </div>
                         </div>
                     </a>
@@ -1207,16 +1206,16 @@ function e($value) {
             <?php endforeach; ?>
         </section>
 
-        <!-- Main Dashboard Split: Recent Appointments & Quick Actions -->
+        <!-- Main Dashboard Split: Recent Appointments -->
         <section class="row g-4">
 
-            <!-- Recent Appointments Table (8 Columns on Large Screens) -->
-            <div class="col-12 col-8">
+            <!-- Recent Appointments Table (Full Width) -->
+            <div class="col-12">
                 <div class="panel">
                     <div class="panel-header">
                         <div>
                             <h5>
-                                <i class="fa-solid fa-calendar-check"></i>
+                                <i class="fa-solid fa-calendar-check" style="color: var(--color-secondary);"></i>
                                 รายการนัดหมายล่าสุด
                             </h5>
                             <p>รายการนัดหมายแพทย์และการติดตามอาการล่าสุดในระบบ</p>
@@ -1232,7 +1231,7 @@ function e($value) {
                             <thead>
                                 <tr>
                                     <th>รหัสนัดหมาย</th>
-                                    <th>ชื่อผู้ป่วย</th>
+                                    <th>ข้อมูลผู้ป่วย</th>
                                     <th>วันที่นัด</th>
                                     <th>เวลานัด</th>
                                     <th>สถานะ</th>
@@ -1249,11 +1248,12 @@ function e($value) {
 
                                         if (in_array($rawStatus, ['ยืนยัน', 'Confirmed', 'confirmed'], true)) {
                                             $statusClass = 'status-confirmed';
-                                            $statusIcon = 'fa-check-circle';
-                                        } elseif (in_array($rawStatus, ['เลื่อน', 'Cancelled', 'cancelled', 'ยกเลิก'], true)) {
+                                            $statusIcon = 'fa-circle-check';
+                                        } elseif (in_array($rawStatus, ['เลื่อน', 'Cancelled', 'cancelled', 'ยกเลิก', 'Rescheduled'], true)) {
                                             $statusClass = 'status-rescheduled';
                                             $statusIcon = 'fa-clock-rotate-left';
                                         }
+                                        $isMale = (($appointment['gender'] ?? '') === 'ชาย');
                                         ?>
                                         <tr>
                                             <!-- Appointment ID -->
@@ -1263,11 +1263,21 @@ function e($value) {
                                                 </span>
                                             </td>
 
-                                            <!-- Patient Name -->
+                                            <!-- Patient Info -->
                                             <td>
-                                                <span class="patient-name-text">
-                                                    <?= e($appointment['name']) ?>
-                                                </span>
+                                                <div class="patient-cell">
+                                                    <div class="patient-avatar-mini <?= $isMale ? 'male' : 'female' ?>">
+                                                        <i class="fa-solid <?= $isMale ? 'fa-mars' : 'fa-venus' ?>"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="patient-name-text">
+                                                            <?= e($appointment['name']) ?>
+                                                        </span>
+                                                        <small class="text-muted d-block" style="font-size: 11px;">
+                                                            <?= e($appointment['gender'] ?? '-') ?>
+                                                        </small>
+                                                    </div>
+                                                </div>
                                             </td>
 
                                             <!-- Date -->

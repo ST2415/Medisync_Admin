@@ -542,6 +542,15 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
             cursor: pointer;
         }
 
+        /* ซ่อนไอคอนลูกศร Dropdown */
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: none !important;
+            padding-right: 14px;
+        }
+
         @media (max-width: 991px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -698,7 +707,7 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                         <div class="col-12 col-md-8">
                             <?php if (!empty($pre_user_id)): ?>
                                 <label class="form-label">
-                                    <i class="fa-solid fa-lock me-1 text-muted"></i> ผู้ป่วยที่ต้องการจัดยา (Patient) <span class="badge" style="background: rgba(74, 128, 126, 0.18); color: var(--color-primary); font-size: 11px;">ล็อกข้อมูล</span>
+                                    ผู้ป่วยที่ต้องการจัดยา (Patient)
                                 </label>
                                 <input type="hidden" name="user_id" value="<?= htmlspecialchars($pre_user_id) ?>">
                                 <select class="form-select" disabled style="background-color: #eef5f5; cursor: not-allowed; color: var(--color-primary); font-weight: 500;">
@@ -710,7 +719,7 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                                         <?php endwhile; ?>
                                     <?php endif; ?>
                                 </select>
-                                <small class="text-muted" style="font-size: 11.5px;"><i class="fa-solid fa-lock me-1"></i>ล็อกข้อมูลผู้ป่วยตามรายการเดิมที่กดเข้ามาไว้</small>
+                                <small class="text-muted" style="font-size: 11.5px;">ล็อกข้อมูลผู้ป่วยตามรายการเดิมที่กดเข้ามาไว้</small>
                             <?php else: ?>
                                 <label class="form-label">
                                     ผู้ป่วยที่ต้องการจัดยา (Patient) <span class="required">*</span>
@@ -797,7 +806,6 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                             <div class="time-pill-option">
                                 <input type="radio" name="time_to_take" id="time_morning" value="เช้า" checked>
                                 <label for="time_morning" class="time-pill-label">
-                                    <i class="fa-solid fa-sun"></i>
                                     <span class="time-name">เช้า</span>
                                     <span class="time-hint">07:00 - 08:30 น.</span>
                                 </label>
@@ -806,7 +814,6 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                             <div class="time-pill-option">
                                 <input type="radio" name="time_to_take" id="time_afternoon" value="กลางวัน">
                                 <label for="time_afternoon" class="time-pill-label">
-                                    <i class="fa-solid fa-cloud-sun"></i>
                                     <span class="time-name">กลางวัน</span>
                                     <span class="time-hint">11:30 - 13:00 น.</span>
                                 </label>
@@ -815,7 +822,6 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                             <div class="time-pill-option">
                                 <input type="radio" name="time_to_take" id="time_evening" value="เย็น">
                                 <label for="time_evening" class="time-pill-label">
-                                    <i class="fa-solid fa-sun-haze"></i>
                                     <span class="time-name">เย็น</span>
                                     <span class="time-hint">17:00 - 18:30 น.</span>
                                 </label>
@@ -824,7 +830,6 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
                             <div class="time-pill-option">
                                 <input type="radio" name="time_to_take" id="time_bedtime" value="ก่อนนอน">
                                 <label for="time_bedtime" class="time-pill-label">
-                                    <i class="fa-solid fa-moon"></i>
                                     <span class="time-name">ก่อนนอน</span>
                                     <span class="time-hint">20:30 - 22:00 น.</span>
                                 </label>

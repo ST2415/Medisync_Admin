@@ -351,6 +351,65 @@ $schedules_query = mysqli_query($conn, "SELECT s.*, u.name AS user_name, m.trade
             background-color: #ffffff;
         }
 
+        /* Date & Time Picker Indicator as Clickable Button */
+        input[type="date"],
+        input[type="time"],
+        input[type="datetime-local"] {
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
+        }
+
         .form-control[readonly] {
             background-color: #eef5f5;
             cursor: not-allowed;
@@ -649,19 +708,33 @@ $schedules_query = mysqli_query($conn, "SELECT s.*, u.name AS user_name, m.trade
                         <!-- Schedule Select (Locked) -->
                         <div class="col-12 col-md-8">
                             <label class="form-label">
-                                <i class="fa-solid fa-lock me-1 text-muted"></i> ตารางยาที่รับประทาน (Schedule) <span class="badge" style="background: rgba(74, 128, 126, 0.18); color: var(--color-primary); font-size: 11px;">ล็อกข้อมูล</span>
+                                ตารางยาที่รับประทาน (Schedule)
                             </label>
-                            <input type="hidden" name="schedule_id" value="<?= htmlspecialchars($row['schedule_id']) ?>">
-                            <select class="form-select" disabled style="background-color: #eef5f5; cursor: not-allowed; color: var(--color-primary); font-weight: 500;">
-                                <?php if ($schedules_query && mysqli_num_rows($schedules_query) > 0): ?>
-                                    <?php while ($sch = mysqli_fetch_assoc($schedules_query)): ?>
-                                        <option value="<?= $sch['schedule_id'] ?>" <?= ($row['schedule_id'] == $sch['schedule_id']) ? 'selected' : '' ?>>
-                                            [ผู้ป่วย: <?= htmlspecialchars($sch['user_name']) ?>] - ตาราง: <?= $sch['schedule_id'] ?> | ยา: <?= htmlspecialchars($sch['trade_name']) ?> (มื้อ<?= $sch['time_to_take'] ?> <?= $sch['dosage_amount'] ?> เม็ด)
-                                        </option>
-                                    <?php endwhile; ?>
-                                <?php endif; ?>
-                            </select>
-                            <small class="text-muted" style="font-size: 11.5px;"><i class="fa-solid fa-lock me-1"></i>ข้อมูลตารางยาและผู้ป่วยถูกล็อกตามรายการเดิมที่กดเข้ามาไว้ (ไม่สามารถเปลี่ยนได้)</small>
+                            <input type="text"
+                                class="form-control"
+                                value="<?php
+                                    $schedule_text = '';
+
+                                    if ($schedules_query && mysqli_num_rows($schedules_query) > 0) {
+                                        while ($sch = mysqli_fetch_assoc($schedules_query)) {
+                                            if ($row['schedule_id'] == $sch['schedule_id']) {
+                                                $schedule_text = '[ผู้ป่วย: ' . $sch['user_name'] . '] - ตาราง: '
+                                                    . $sch['schedule_id'] . ' | ยา: '
+                                                    . $sch['trade_name'] . ' (มื้อ'
+                                                    . $sch['time_to_take'] . ' '
+                                                    . $sch['dosage_amount'] . ' เม็ด)';
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    echo htmlspecialchars($schedule_text);
+                                ?>"
+                                readonly>
+
+                            <input type="hidden"
+                                name="schedule_id"
+                                value="<?= htmlspecialchars($row['schedule_id']) ?>">
                         </div>
                     </div>
 
@@ -687,6 +760,7 @@ $schedules_query = mysqli_query($conn, "SELECT s.*, u.name AS user_name, m.trade
                                    id="action_time" 
                                    class="form-control" 
                                    value="<?= date('Y-m-d\TH:i', strtotime($row['action_time'])) ?>" 
+                                   onclick="this.showPicker && this.showPicker()"
                                    required>
                         </div>
 

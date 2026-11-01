@@ -422,6 +422,65 @@ if (isset($_POST['submit'])) {
             box-shadow: 0 0 0 3px rgba(78, 127, 144, 0.18);
         }
 
+        /* Date & Time Picker Indicator as Clickable Button */
+        input[type="date"],
+        input[type="time"],
+        input[type="datetime-local"] {
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
+        }
+
         .custom-input:read-only {
             background: rgba(187, 215, 218, 0.25);
             color: var(--text-muted);
@@ -796,6 +855,7 @@ if (isset($_POST['submit'])) {
                                name="appointment_date"
                                class="custom-input"
                                value="<?= e($apt['appointment_date']) ?>"
+                               onclick="this.showPicker && this.showPicker()"
                                required>
                     </div>
 
@@ -810,6 +870,7 @@ if (isset($_POST['submit'])) {
                                name="appointment_time"
                                class="custom-input"
                                value="<?= e(substr($apt['appointment_time'], 0, 5)) ?>"
+                               onclick="this.showPicker && this.showPicker()"
                                required>
                         <!-- Quick Time Chips -->
                         <div class="time-chips-wrap">

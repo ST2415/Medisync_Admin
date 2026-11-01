@@ -28,12 +28,44 @@ if (isset($_POST['submit'])) {
     $indications = trim($_POST['indications'] ?? '');
     $side_effects = trim($_POST['side_effects'] ?? '');
     $precautions = trim($_POST['precautions'] ?? '');
+
     $image_url = trim($_POST['image_url'] ?? '');
+    $remove_image = isset($_POST['remove_image']) && $_POST['remove_image'] === '1';
+
+    if ($remove_image) {
+        $image_url = '';
+    }
+
+    // จัดการอัปโหลดไฟล์รูปภาพจากเครื่อง
+    if (isset($_FILES['medicine_image']) && $_FILES['medicine_image']['error'] === UPLOAD_ERR_OK) {
+        $fileTmpPath = $_FILES['medicine_image']['tmp_name'];
+        $fileName = $_FILES['medicine_image']['name'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+        $allowedExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        if (in_array($fileExtension, $allowedExtensions)) {
+            $uploadDir = '../uploads/medicines/';
+            if (!is_dir($uploadDir)) {
+                @mkdir($uploadDir, 0777, true);
+            }
+
+            $newFileName = 'med_' . $tpu_code . '_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . $fileExtension;
+            $destPath = $uploadDir . $newFileName;
+
+            if (move_uploaded_file($fileTmpPath, $destPath)) {
+                $image_url = $destPath;
+            } else {
+                $errorMsg = "ไม่สามารถบันทึกไฟล์รูปภาพที่อัปโหลดได้";
+            }
+        } else {
+            $errorMsg = "รูปแบบไฟล์รูปภาพไม่ถูกต้อง (รองรับเฉพาะ JPG, PNG, WEBP, GIF)";
+        }
+    }
 
     // ตรวจสอบความถูกต้องเบื้องต้น
-    if ($trade_name === '' || $active_ingredient === '' || $dosageform === '') {
+    if ($errorMsg === '' && ($trade_name === '' || $active_ingredient === '' || $dosageform === '')) {
         $errorMsg = "กรุณากรอกข้อมูลสำคัญให้ครบถ้วน (ชื่อทางการค้า, ตัวยาสำคัญ, รูปแบบยา)";
-    } else {
+    } elseif ($errorMsg === '') {
         // ตรวจสอบว่ามีรหัส TPU นี้อยู่แล้วหรือไม่
         $checkStmt = $conn->prepare("SELECT tpu_code FROM medicines WHERE tpu_code = ? LIMIT 1");
         $checkStmt->bind_param("i", $tpu_code);
@@ -490,37 +522,113 @@ if (isset($_POST['submit'])) {
             color: var(--color-white);
         }
 
-        /* Image Preview Box */
+        /* ===== IMAGE UPLOAD & PREVIEW SECTION ===== */
+        .image-manager-card {
+            background: #FFFFFF;
+            border: 1px solid rgba(74, 128, 126, 0.22);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(41, 69, 73, 0.04);
+        }
+
         .image-preview-card {
-            border: 2px dashed rgba(74, 128, 126, 0.3);
+            border: 2px dashed rgba(74, 128, 126, 0.35);
             border-radius: 14px;
-            padding: 14px;
+            padding: 20px;
             background: #FAFCFC;
             text-align: center;
-            min-height: 140px;
+            min-height: 180px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-preview-card:hover,
+        .image-preview-card.drag-over {
+            border-color: var(--color-secondary);
+            background: rgba(187, 215, 218, 0.18);
         }
 
         .preview-img-display {
-            max-height: 130px;
+            max-height: 180px;
             max-width: 100%;
             object-fit: contain;
-            border-radius: 8px;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(41, 69, 73, 0.12);
             display: none;
         }
 
         .preview-placeholder {
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 13px;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 6px;
+            user-select: none;
+        }
+
+        .img-badge-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            background: rgba(78, 127, 144, 0.12);
+            color: var(--color-primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        .btn-img-action {
+            font-size: 12.5px;
+            padding: 7px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            border: none;
+        }
+
+        .btn-img-browse {
+            background: var(--color-secondary);
+            color: var(--color-white);
+        }
+
+        .btn-img-browse:hover {
+            background: var(--color-primary);
+        }
+
+        .btn-img-link {
+            background: rgba(187, 215, 218, 0.35);
+            color: var(--color-primary);
+            border: 1px solid rgba(74, 128, 126, 0.3);
+        }
+
+        .btn-img-link:hover,
+        .btn-img-link.active {
+            background: var(--color-secondary);
+            border-color: var(--color-secondary);
+            color: var(--color-white);
+        }
+
+        .btn-img-remove {
+            background: rgba(220, 53, 69, 0.12);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-img-remove:hover {
+            background: #dc3545;
+            color: #ffffff;
         }
 
         /* Form Actions */
@@ -767,7 +875,7 @@ if (isset($_POST['submit'])) {
             </div>
 
             <!-- Form -->
-            <form method="POST" action="add-medicine.php">
+            <form method="POST" action="add-medicine.php" enctype="multipart/form-data">
                 <div class="row g-4">
 
                     <!-- TPU Code -->
@@ -883,31 +991,89 @@ if (isset($_POST['submit'])) {
                         </div>
                     </div>
 
-                    <!-- Image URL -->
-                    <div class="col-12 col-md-6">
-                        <label class="form-group-label" for="image_url">
-                            <i class="fa-solid fa-image text-secondary"></i>
-                            ลิงก์รูปภาพยา (Image URL)
-                        </label>
-                        <input type="url"
-                               id="image_url"
-                               name="image_url"
-                               class="custom-input"
-                               placeholder="https://example.com/medicine.jpg"
-                               oninput="updateImagePreview(this.value)">
-                        <small class="text-muted" style="font-size: 11px;">
-                            ใส่ URL รูปภาพเวชภัณฑ์ (ระบบจะแสดงภาพพรีวิวอัตโนมัติ)
-                        </small>
-                    </div>
-
-                    <!-- Live Image Preview Card -->
+                    <!-- Medicine Image Management Box -->
                     <div class="col-12">
-                        <div class="image-preview-card" id="imagePreviewCard">
-                            <img id="previewImg" src="" alt="Medicine Preview" class="preview-img-display">
-                            <div class="preview-placeholder" id="previewPlaceholder">
-                                <i class="fa-solid fa-image fs-3 opacity-50"></i>
-                                <span>ตัวอย่างรูปภาพยา (จะแสดงทันทีเมื่อวาง URL รูปภาพที่ถูกต้อง)</span>
+                        <div class="image-manager-card">
+                            <label class="form-group-label mb-1" style="font-size: 14px;">
+                                <i class="fa-solid fa-image text-secondary me-1"></i>
+                                รูปภาพเวชภัณฑ์ / รูปถ่ายยา (Medicine Image)
+                            </label>
+                            <div class="text-muted mb-3" style="font-size: 12px;">
+                                จัดการรูปภาพยา สามารถเลือกรูปจากเครื่อง แนบลิงก์ หรือลบรูปภาพได้
                             </div>
+
+                            <!-- Single Row with Exactly 1 of each button -->
+                            <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                                <input type="file"
+                                       id="medicine_image"
+                                       name="medicine_image"
+                                       accept="image/png, image/jpeg, image/jpg, image/webp, image/gif"
+                                       style="display: none;"
+                                       onchange="handleFileSelect(event)">
+
+                                <!-- 1. ปุ่มเลือกรูปภาพจากเครื่อง (1 ปุ่ม) -->
+                                <button type="button" class="btn-img-action btn-img-browse" onclick="triggerFileInput()">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    <span>เลือกรูปจากเครื่อง</span>
+                                </button>
+
+                                <!-- 2. ปุ่มแนบลิงก์ (1 ปุ่ม) -->
+                                <button type="button" class="btn-img-action btn-img-link" id="btnToggleUrl" onclick="toggleUrlInput()">
+                                    <i class="fa-solid fa-link"></i>
+                                    <span>แนบลิงก์รูปยา</span>
+                                </button>
+
+                                <!-- 3. ปุ่มลบรูป (1 ปุ่ม) -->
+                                <button type="button" class="btn-img-action btn-img-remove" id="btnRemoveImg" onclick="removeCurrentImage()" style="display: none;">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span>ลบรูป</span>
+                                </button>
+
+                                <span id="selectedFileName" class="text-muted ms-2" style="font-size: 12px;"></span>
+                            </div>
+
+                            <!-- URL Input (shown when clicking "แนบลิงก์รูปยา") -->
+                            <div id="urlInputContainer" class="mb-3" style="display: none;">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0" style="border-color: rgba(74, 128, 126, 0.3); border-radius: 12px 0 0 12px;">
+                                        <i class="fa-solid fa-link text-secondary"></i>
+                                    </span>
+                                    <input type="url"
+                                           id="image_url"
+                                           name="image_url"
+                                           class="form-control custom-input border-start-0"
+                                           style="border-radius: 0 12px 12px 0;"
+                                           placeholder="วางลิงก์รูปภาพ เช่น https://example.com/medicine.jpg"
+                                           oninput="handleUrlInput(this.value)">
+                                </div>
+                                <small class="text-muted d-block mt-1" style="font-size: 11px;">
+                                    * ภาพตัวอย่างจะแสดงทันทีเมื่อวางลิงก์ URL ที่ถูกต้อง
+                                </small>
+                            </div>
+
+                            <!-- Hidden remove image flag -->
+                            <input type="hidden" id="remove_image" name="remove_image" value="0">
+
+                            <!-- Interactive Image Preview Box (กล่องเก็บภาพ) -->
+                            <div class="image-preview-card" id="imagePreviewCard" onclick="triggerFileInput()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" title="คลิกเพื่อเลือกรูปภาพจากเครื่อง หรือลากไฟล์ภาพมาวาง">
+                                <img id="previewImg"
+                                     src=""
+                                     alt="Medicine Preview"
+                                     class="preview-img-display">
+
+                                <div class="preview-placeholder" id="previewPlaceholder">
+                                    <i class="fa-solid fa-cloud-arrow-up fs-2 opacity-50 text-secondary mb-1"></i>
+                                    <strong>คลิกที่นี่เพื่อเลือกรูปภาพจากเครื่อง</strong>
+                                    <span>หรือลากไฟล์ภาพมาวางในกล่องนี้ หรือใช้ปุ่มแนบลิงก์ด้านบน</span>
+                                    <small class="opacity-75">(รองรับไฟล์ JPG, PNG, WEBP, GIF)</small>
+                                </div>
+
+                                <div id="previewStatusBadge" class="img-badge-info" style="display: none;">
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                    <span id="badgeText"></span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
@@ -1009,6 +1175,131 @@ if (isset($_POST['submit'])) {
         }
     }
 
+    function triggerFileInput() {
+        document.getElementById('medicine_image').click();
+    }
+
+    function toggleUrlInput() {
+        const urlWrap = document.getElementById('urlInputContainer');
+        const btnLink = document.getElementById('btnToggleUrl');
+        const urlInput = document.getElementById('image_url');
+        if (urlWrap.style.display === 'none' || urlWrap.style.display === '') {
+            urlWrap.style.display = 'block';
+            btnLink.classList.add('active');
+            urlInput.focus();
+        } else {
+            urlWrap.style.display = 'none';
+            btnLink.classList.remove('active');
+        }
+    }
+
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.match('image.*')) {
+            alert('กรุณาเลือกไฟล์ที่เป็นรูปภาพเท่านั้น (JPG, PNG, WEBP, GIF)');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            setPreviewImage(e.target.result, 'รูปจากเครื่อง: ' + file.name);
+            document.getElementById('remove_image').value = '0';
+            document.getElementById('image_url').value = '';
+            document.getElementById('selectedFileName').innerHTML = '<span class="text-success fw-bold"><i class="fa-solid fa-check"></i> ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)</span>';
+            document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function handleUrlInput(url) {
+        document.getElementById('medicine_image').value = '';
+        document.getElementById('selectedFileName').innerHTML = '';
+        document.getElementById('remove_image').value = '0';
+
+        if (url && url.trim() !== '') {
+            setPreviewImage(url.trim(), 'ลิงก์รูปภาพภายนอก');
+            document.getElementById('btnRemoveImg').style.display = 'inline-flex';
+        } else {
+            clearPreviewUI();
+        }
+    }
+
+    function setPreviewImage(src, badgeLabel) {
+        const previewImg = document.getElementById('previewImg');
+        const placeholder = document.getElementById('previewPlaceholder');
+        const badge = document.getElementById('previewStatusBadge');
+        const badgeText = document.getElementById('badgeText');
+
+        previewImg.src = src;
+        previewImg.style.display = 'block';
+        placeholder.style.display = 'none';
+        badge.style.display = 'inline-flex';
+        badgeText.innerText = badgeLabel;
+
+        previewImg.onerror = function() {
+            previewImg.style.display = 'none';
+            placeholder.style.display = 'flex';
+            placeholder.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger fs-3"></i><span>ไม่สามารถโหลดรูปภาพได้ กรุณาตรวจสอบไฟล์หรือ URL</span>';
+            badge.style.display = 'none';
+        };
+        previewImg.onload = function() {
+            previewImg.style.display = 'block';
+            placeholder.style.display = 'none';
+            badge.style.display = 'inline-flex';
+        };
+    }
+
+    function clearPreviewUI() {
+        const previewImg = document.getElementById('previewImg');
+        const placeholder = document.getElementById('previewPlaceholder');
+        const badge = document.getElementById('previewStatusBadge');
+
+        previewImg.src = '';
+        previewImg.style.display = 'none';
+        placeholder.style.display = 'flex';
+        placeholder.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fs-2 opacity-50 text-secondary mb-1"></i><strong>คลิกที่นี่เพื่อเลือกรูปภาพจากเครื่อง</strong><span>หรือลากไฟล์ภาพมาวาง หรือใช้ปุ่มด้านบน</span><small class="opacity-75">(JPG, PNG, WEBP, GIF)</small>';
+        badge.style.display = 'none';
+        document.getElementById('btnRemoveImg').style.display = 'none';
+    }
+
+    function removeCurrentImage() {
+        document.getElementById('remove_image').value = '1';
+        document.getElementById('medicine_image').value = '';
+        document.getElementById('image_url').value = '';
+        document.getElementById('selectedFileName').innerHTML = '<span class="text-danger"><i class="fa-solid fa-trash-can me-1"></i> ลบรูปภาพแล้ว</span>';
+        clearPreviewUI();
+    }
+
+    // Drag and Drop handlers
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('imagePreviewCard').classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('imagePreviewCard').classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.getElementById('imagePreviewCard').classList.remove('drag-over');
+
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const file = e.dataTransfer.files[0];
+            const fileInput = document.getElementById('medicine_image');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            handleFileSelect({ target: { files: [file] } });
+        }
+    }
+
     function applyPreset(trade, active, strength, form, indications, sideEffects, precautions, img) {
         document.getElementById('trade_name').value = trade;
         document.getElementById('active_ingredient').value = active;
@@ -1017,32 +1308,19 @@ if (isset($_POST['submit'])) {
         document.getElementById('indications').value = indications;
         document.getElementById('side_effects').value = sideEffects;
         document.getElementById('precautions').value = precautions;
+        
         document.getElementById('image_url').value = img;
-        updateImagePreview(img);
-    }
+        document.getElementById('medicine_image').value = '';
+        document.getElementById('remove_image').value = '0';
+        document.getElementById('selectedFileName').innerHTML = '';
 
-    function updateImagePreview(url) {
-        const previewImg = document.getElementById('previewImg');
-        const placeholder = document.getElementById('previewPlaceholder');
-
-        if (url && url.trim() !== '') {
-            previewImg.src = url;
-            previewImg.style.display = 'block';
-            placeholder.style.display = 'none';
-
-            previewImg.onerror = function() {
-                previewImg.style.display = 'none';
-                placeholder.style.display = 'flex';
-                placeholder.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-danger fs-3"></i><span>ไม่สามารถโหลดรูปภาพจาก URL นี้ได้</span>';
-            };
-            previewImg.onload = function() {
-                previewImg.style.display = 'block';
-                placeholder.style.display = 'none';
-            };
+        if (img && img.trim() !== '') {
+            document.getElementById('urlInputContainer').style.display = 'block';
+            document.getElementById('btnToggleUrl').classList.add('active');
+            setPreviewImage(img, 'รูปภาพจาก Preset');
+            document.getElementById('btnRemoveImg').style.display = 'inline-flex';
         } else {
-            previewImg.style.display = 'none';
-            placeholder.style.display = 'flex';
-            placeholder.innerHTML = '<i class="fa-solid fa-image fs-3 opacity-50"></i><span>ตัวอย่างรูปภาพยา (จะแสดงทันทีเมื่อวาง URL รูปภาพที่ถูกต้อง)</span>';
+            clearPreviewUI();
         }
     }
 

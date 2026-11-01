@@ -7,8 +7,24 @@ function e($value) {
     return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
 }
 
-// รับค่าคำค้นหา
+// รับค่าคำค้นหาและตัวกรอง
 $search = trim($_GET['search'] ?? '');
+$filterGender = trim($_GET['gender'] ?? '');
+$filterDisease = trim($_GET['disease'] ?? '');
+
+// ดึงรายการโรคที่มีทั้งหมดสำหรับตัวเลือกกรอง
+$diseasesList = [];
+$diseaseRes = $conn->query("
+    SELECT DISTINCT disease 
+    FROM users 
+    WHERE disease IS NOT NULL AND disease != '' 
+    ORDER BY disease ASC
+");
+if ($diseaseRes) {
+    while ($dRow = $diseaseRes->fetch_assoc()) {
+        $diseasesList[] = $dRow['disease'];
+    }
+}
 
 // ฟังก์ชันนับจำนวนข้อมูลสำหรับ Summary Cards
 function countRecords($conn, $table) {
@@ -58,36 +74,47 @@ $sql = "
         ) AS total_logs
 
     FROM users u
+    WHERE 1=1
 ";
 
+$params = [];
+$types = "";
+
 if ($search !== '') {
-    $sql .= "
-        WHERE CAST(u.user_id AS CHAR) LIKE ?
-            OR u.name LIKE ?
-            OR u.gender LIKE ?
-            OR u.symptoms LIKE ?
-            OR u.causes LIKE ?
-            OR u.disease LIKE ?
-            OR u.medicine LIKE ?
-    ";
+    $sql .= " AND (
+        CAST(u.user_id AS CHAR) LIKE ?
+        OR u.name LIKE ?
+        OR u.gender LIKE ?
+        OR u.symptoms LIKE ?
+        OR u.causes LIKE ?
+        OR u.disease LIKE ?
+        OR u.medicine LIKE ?
+    )";
+    $keyword = "%{$search}%";
+    for ($i = 0; $i < 7; $i++) {
+        $params[] = $keyword;
+        $types .= "s";
+    }
+}
+
+if ($filterGender !== '') {
+    $sql .= " AND u.gender = ?";
+    $params[] = $filterGender;
+    $types .= "s";
+}
+
+if ($filterDisease !== '') {
+    $sql .= " AND u.disease = ?";
+    $params[] = $filterDisease;
+    $types .= "s";
 }
 
 $sql .= " ORDER BY u.user_id ASC";
 
 $stmt = $conn->prepare($sql);
 
-if ($search !== '') {
-    $keyword = "%{$search}%";
-    $stmt->bind_param(
-        "sssssss",
-        $keyword,
-        $keyword,
-        $keyword,
-        $keyword,
-        $keyword,
-        $keyword,
-        $keyword
-    );
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
 }
 
 $stmt->execute();
@@ -544,15 +571,11 @@ $stmt->close();
         }
 
         .stat-description {
-            font-size: 11.5px;
-            color: var(--color-teal);
-            font-weight: 500;
-            display: inline-flex;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(74, 128, 126, 0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
         }
 
         /* ===== MAIN DATA PANEL ===== */
@@ -591,12 +614,118 @@ $stmt->close();
             margin: 4px 0 0;
         }
 
-        /* ===== SEARCH BOX ===== */
+        /* ===== SEARCH & FILTER CONTROLS ===== */
+        .filter-controls-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
         .search-container {
             display: flex;
             gap: 8px;
-            width: 100%;
-            max-width: 440px;
+            width: auto;
+            min-width: 170px;
+            max-width: 240px;
+            flex: 1 1 auto;
+        }
+
+        .filter-select {
+            border: 1px solid rgba(74, 128, 126, 0.3);
+            border-radius: 12px;
+            padding: 8px 28px 8px 12px;
+            font-family: inherit;
+            font-size: 12px;
+            background-color: #FAFCFC;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A807E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 11px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            color: var(--color-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .filter-select[name="gender"] {
+            min-width: 105px;
+            max-width: 120px;
+        }
+
+        .filter-select[name="disease"] {
+            min-width: 140px;
+            max-width: 185px;
+            text-overflow: ellipsis;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+            background-color: #FFFFFF;
+        }
+
+        /* Date & Time Picker Indicator as Clickable Button */
+        input[type="date"],
+        input[type="time"],
+        input[type="datetime-local"] {
+            cursor: pointer;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            background-color: rgba(74, 128, 126, 0.14);
+            border: 1px solid rgba(74, 128, 126, 0.35);
+            border-radius: 8px;
+            padding: 6px 8px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23294549' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 15px 15px;
+            box-shadow: 0 1px 4px rgba(41, 69, 73, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover,
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator:hover {
+            background-color: #4A807E !important;
+            border-color: #4A807E !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpolyline points='12 6 12 12 16 14'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: center !important;
+            background-size: 15px 15px !important;
+            box-shadow: 0 2px 8px rgba(74, 128, 126, 0.45) !important;
+            transform: scale(1.06);
         }
 
         .search-input-wrapper {
@@ -617,9 +746,9 @@ $stmt->close();
             width: 100%;
             border: 1px solid rgba(74, 128, 126, 0.3);
             border-radius: 12px;
-            padding: 10px 14px 10px 36px;
+            padding: 8px 12px 8px 34px;
             font-family: inherit;
-            font-size: 12.5px;
+            font-size: 12px;
             background: #FAFCFC;
             color: var(--color-primary);
             transition: all 0.2s ease;
@@ -637,8 +766,8 @@ $stmt->close();
             color: var(--color-white);
             border: none;
             border-radius: 12px;
-            padding: 10px 18px;
-            font-size: 12.5px;
+            padding: 8px 14px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -646,6 +775,7 @@ $stmt->close();
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .btn-search:hover {
@@ -658,12 +788,15 @@ $stmt->close();
             color: var(--color-primary);
             background: rgba(187, 215, 218, 0.25);
             border-radius: 12px;
-            padding: 10px 14px;
-            font-size: 13px;
+            padding: 8px 11px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
         }
 
         .btn-reset:hover {
@@ -716,30 +849,80 @@ $stmt->close();
         }
 
         .user-id-badge {
-            color: var(--color-secondary);
+            color: var(--color-primary);
             font-weight: 700;
-            background: rgba(78, 127, 144, 0.1);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
+            background: rgba(78, 127, 144, 0.14);
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11.5px;
             display: inline-block;
+            font-family: monospace;
+            border: 1px solid rgba(78, 127, 144, 0.25);
         }
 
         .user-name-link {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
+            text-decoration: none;
             color: inherit;
             transition: transform 0.18s ease;
         }
 
         .user-name-link:hover {
-            transform: translateX(4px);
+            transform: translateX(3px);
         }
 
-        .user-name-link:hover .user-name-text {
+        .user-name-link:hover .patient-name-text {
             color: var(--color-secondary);
             text-decoration: underline;
+        }
+
+        .patient-info-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .patient-avatar-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            background: rgba(144, 194, 183, 0.3);
+            color: var(--color-primary);
+            border: 1px solid rgba(144, 194, 183, 0.6);
+        }
+
+        .patient-avatar-male {
+            background: rgba(78, 127, 144, 0.2);
+            color: #294549;
+            border: 1px solid rgba(78, 127, 144, 0.4);
+        }
+
+        .patient-avatar-female {
+            background: rgba(144, 194, 183, 0.3);
+            color: #175249;
+            border: 1px solid rgba(144, 194, 183, 0.6);
+        }
+
+        .patient-name-text {
+            font-weight: 700;
+            color: var(--color-primary);
+            font-size: 13.5px;
+            display: block;
+        }
+
+        .patient-meta-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
         }
 
         .btn-view-details {
@@ -802,6 +985,16 @@ $stmt->close();
         .gender-female {
             background: rgba(144, 194, 183, 0.25);
             color: #175249;
+        }
+
+        .disease-tag-sm {
+            display: inline-block;
+            background: rgba(74, 128, 126, 0.14);
+            color: #1f4745;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10.5px;
+            font-weight: 600;
         }
 
         /* Symptom & Cause Tags */
@@ -1019,8 +1212,17 @@ $stmt->close();
                 padding: 20px 18px;
             }
 
+            .filter-controls-wrap {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
             .search-container {
-                max-width: 100%;
+                min-width: 170px;
+                max-width: 240px;
             }
         }
 
@@ -1367,7 +1569,7 @@ $stmt->close();
                     </div>
                     <div class="stat-description">
                         <i class="fa-solid fa-bell"></i>
-                        <span>กำหนดเวลาแจ้งเตือน</span>
+                        <span>กำหนดเวลาแจ้งเตือนในระบบ</span>
                     </div>
                 </div>
             </div>
@@ -1389,7 +1591,7 @@ $stmt->close();
                     </div>
                     <div class="stat-description">
                         <i class="fa-solid fa-clipboard-check"></i>
-                        <span>รายการที่บันทึกแล้ว</span>
+                        <span>บันทึกการทานยาในระบบ</span>
                     </div>
                 </div>
             </div>
@@ -1408,25 +1610,45 @@ $stmt->close();
                     <p>แสดงรายละเอียดข้อมูลผู้ป่วย โรคที่ตรวจพบ และรายการยาที่แนะนำ</p>
                 </div>
 
-                <!-- Search Box -->
-                <form method="GET" action="user.php" class="search-container">
-                    <div class="search-input-wrapper">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input
-                            type="text"
-                            name="search"
-                            placeholder="ค้นหา ID, ชื่อผู้ใช้, เพศ, อาการ, โรค, ยา..."
-                            value="<?= e($search) ?>"
-                        >
+                <!-- Search & Filters -->
+                <form method="GET" action="user.php" class="filter-controls-wrap">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input
+                                type="text"
+                                name="search"
+                                placeholder="ค้นหา ID, ชื่อผู้ใช้, อาการ, โรค, ยา..."
+                                value="<?= e($search) ?>"
+                            >
+                        </div>
                     </div>
 
+                    <!-- Gender Filter -->
+                    <select name="gender" class="filter-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกเพศ --</option>
+                        <option value="ชาย" <?= $filterGender === 'ชาย' ? 'selected' : '' ?>>เพศชาย</option>
+                        <option value="หญิง" <?= $filterGender === 'หญิง' ? 'selected' : '' ?>>เพศหญิง</option>
+                    </select>
+
+                    <!-- Disease Filter -->
+                    <select name="disease" class="filter-select" onchange="this.form.submit()">
+                        <option value="">-- ทุกโรคที่วินิจฉัย --</option>
+                        <?php foreach ($diseasesList as $diseaseItem): ?>
+                            <option value="<?= e($diseaseItem) ?>" <?= $filterDisease === $diseaseItem ? 'selected' : '' ?>>
+                                <?= e($diseaseItem) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+
                     <button type="submit" class="btn-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                         <span>ค้นหา</span>
                     </button>
 
-                    <?php if ($search !== ''): ?>
-                        <a href="user.php" class="btn-reset" title="ล้างการค้นหา">
-                            <i class="fa-solid fa-xmark"></i>
+                    <?php if ($search !== '' || $filterGender !== '' || $filterDisease !== ''): ?>
+                        <a href="user.php" class="btn-reset" title="ล้างตัวกรองและการค้นหา">
+                            <i class="fa-solid fa-rotate-left"></i>
                         </a>
                     <?php endif; ?>
                 </form>
@@ -1438,8 +1660,7 @@ $stmt->close();
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>ชื่อผู้ใช้</th>
-                            <th>เพศ</th>
+                            <th>ข้อมูลผู้ใช้</th>
                             <th>วันเกิด</th>
                             <th>อาการ</th>
                             <th>สาเหตุ</th>
@@ -1454,8 +1675,7 @@ $stmt->close();
                             <?php foreach ($users as $user): ?>
                                 <?php
                                 $isMale = ($user['gender'] === 'ชาย');
-                                $avatarClass = $isMale ? 'user-avatar-male' : 'user-avatar-female';
-                                $genderClass = $isMale ? 'gender-male' : 'gender-female';
+                                $avatarClass = $isMale ? 'patient-avatar-male' : 'patient-avatar-female';
                                 $genderIcon = $isMale ? 'fa-mars' : 'fa-venus';
                                 ?>
                                 <tr>
@@ -1466,24 +1686,26 @@ $stmt->close();
                                         </span>
                                     </td>
 
-                                    <!-- User Name (กดตรงนี้เพื่อไปดูรายละเอียดผู้ป่วยใน user-details.php) -->
+                                    <!-- User Info (Profile Avatar + Name + Gender) -->
                                     <td>
                                         <a href="user-details.php?id=<?= urlencode($user['user_id']) ?>"
-                                           class="user-name-link"
+                                           class="user-name-link text-decoration-none"
                                            title="คลิกเพื่อดูรายละเอียดผู้ป่วย ตารางเวลา และประวัติการทานยา">
-                                            <span class="user-name-text">
-                                                <?= e($user['name']) ?>
-                                            </span>
-                                            <i class="fa-solid fa-circle-chevron-right ms-1" style="font-size: 11px; color: var(--color-teal); opacity: 0.8;"></i>
+                                            <div class="patient-info-block">
+                                                <div class="patient-avatar-box <?= $avatarClass ?>">
+                                                    <i class="fa-solid <?= $genderIcon ?>"></i>
+                                                </div>
+                                                <div>
+                                                    <span class="patient-name-text">
+                                                        <?= e($user['name']) ?>
+                                                        <i class="fa-solid fa-circle-chevron-right ms-1" style="font-size: 11px; color: var(--color-teal); opacity: 0.8;"></i>
+                                                    </span>
+                                                    <div class="patient-meta-sub">
+                                                        <span><?= e($user['gender'] ?? '-') ?></span>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </a>
-                                    </td>
-
-                                    <!-- Gender -->
-                                    <td>
-                                        <span class="gender-pill <?= $genderClass ?>">
-                                            <i class="fa-solid <?= $genderIcon ?>"></i>
-                                            <?= e($user['gender']) ?>
-                                        </span>
                                     </td>
 
                                     <!-- Date of Birth -->
@@ -1494,25 +1716,35 @@ $stmt->close();
 
                                     <!-- Symptoms -->
                                     <td>
-                                        <?= e($user['symptoms']) ?>
+                                        <?= !empty($user['symptoms']) ? e($user['symptoms']) : '<span class="text-muted">-</span>' ?>
                                     </td>
 
                                     <!-- Causes -->
                                     <td>
-                                        <?= e($user['causes']) ?>
+                                        <?= !empty($user['causes']) ? e($user['causes']) : '<span class="text-muted">-</span>' ?>
                                     </td>
 
                                     <!-- Diagnosis / Disease -->
                                     <td>
-                                        <?= e($user['disease']) ?>
+                                        <?php if (!empty($user['disease'])): ?>
+                                            <span class="disease-tag-sm">
+                                                <i class="fa-solid fa-stethoscope me-1"></i><?= e($user['disease']) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif; ?>
                                     </td>
 
                                     <!-- Medicine -->
                                     <td>
-                                        <span class="medicine-pill">
-                                            <i class="fa-solid fa-capsules"></i>
-                                            <?= e($user['medicine']) ?>
-                                        </span>
+                                        <?php if (!empty($user['medicine'])): ?>
+                                            <span class="medicine-pill">
+                                                <i class="fa-solid fa-capsules"></i>
+                                                <?= e($user['medicine']) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="text-muted">-</span>
+                                        <?php endif; ?>
                                     </td>
 
                                     <!-- Actions -->
@@ -1522,7 +1754,7 @@ $stmt->close();
                                                class="btn-action btn-view-details"
                                                title="ดูประวัติการกินยาและตารางเวลา">
                                                 <i class="fa-solid fa-file-medical"></i>
-                                                <span>ดูข้อมูล</span>
+                                                <span>ดู</span>
                                             </a>
 
                                             <a href="edit-user.php?id=<?= urlencode($user['user_id']) ?>"
@@ -1546,15 +1778,15 @@ $stmt->close();
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="10" class="empty-state">
+                                <td colspan="8" class="empty-state">
                                     <i class="fa-solid fa-users-slash d-block"></i>
                                     <h6>ไม่พบข้อมูลผู้ใช้ที่ค้นหา</h6>
                                     <p class="mb-3">
-                                        <?= $search !== '' ? 'ไม่มีข้อมูลที่ตรงกับคำค้นหา "' . e($search) . '"' : 'ยังไม่มีข้อมูลผู้ใช้ในระบบ' ?>
+                                        <?= ($search !== '' || $filterGender !== '' || $filterDisease !== '') ? 'ไม่มีข้อมูลที่ตรงกับคำค้นหาหรือตัวกรองที่เลือก' : 'ยังไม่มีข้อมูลผู้ใช้ในระบบ' ?>
                                     </p>
-                                    <?php if ($search !== ''): ?>
+                                    <?php if ($search !== '' || $filterGender !== '' || $filterDisease !== ''): ?>
                                         <a href="user.php" class="btn btn-sm btn-outline-primary" style="border-radius: 20px;">
-                                            <i class="fa-solid fa-rotate-left me-1"></i> ดูข้อมูลทั้งหมด
+                                            <i class="fa-solid fa-rotate-left me-1"></i> ล้างตัวกรองและดูทั้งหมด
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -1568,8 +1800,8 @@ $stmt->close();
             <div class="result-info">
                 <div>
                     แสดงข้อมูลทั้งหมด <strong><?= count($users) ?></strong> รายการ
-                    <?php if ($search !== ''): ?>
-                        (ผลการค้นหาสำหรับ "<em><?= e($search) ?></em>")
+                    <?php if ($search !== '' || $filterGender !== '' || $filterDisease !== ''): ?>
+                        (ผลจากการกรองข้อมูล)
                     <?php endif; ?>
                 </div>
                 <div>
