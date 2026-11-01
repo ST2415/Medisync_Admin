@@ -1,0 +1,1023 @@
+<?php
+$pageTitle = "Add Appointment";
+include "../db_conn.php";
+
+$errorMsg = "";
+
+// คำนวณรหัส Appointment ID ถัดไป (รูปแบบ ap_X)
+$maxNum = 1;
+$resApt = mysqli_query($conn, "SELECT appointment_id FROM appointments");
+if ($resApt) {
+    while ($rowA = mysqli_fetch_assoc($resApt)) {
+        if (preg_match('/^ap_(\d+)$/', $rowA['appointment_id'], $m)) {
+            $num = (int)$m[1];
+            if ($num > $maxNum) {
+                $maxNum = $num;
+            }
+        }
+    }
+}
+$nextAppointmentId = "ap_" . ($maxNum + 1);
+
+// ดึงรายชื่อผู้ป่วยทั้งหมดสำหรับ Dropdown
+$usersList = [];
+$resUsers = mysqli_query($conn, "SELECT user_id, name, gender, disease, medicine FROM users ORDER BY name ASC");
+if ($resUsers) {
+    while ($u = mysqli_fetch_assoc($resUsers)) {
+        $usersList[] = $u;
+    }
+}
+
+// เมื่อ Submit Form
+if (isset($_POST['submit'])) {
+    $appointment_id = trim($_POST['appointment_id'] ?? '');
+    if ($appointment_id === '') {
+        $appointment_id = $nextAppointmentId;
+    }
+
+    $user_id = (int)($_POST['user_id'] ?? 0);
+    $appointment_date = trim($_POST['appointment_date'] ?? '');
+    $appointment_time = trim($_POST['appointment_time'] ?? '');
+    $status = trim($_POST['status'] ?? 'รอยืนยัน');
+
+    if ($appointment_time !== '' && strlen($appointment_time) === 5) {
+        $appointment_time .= ":00";
+    }
+
+    // Validation
+    if ($user_id <= 0) {
+        $errorMsg = "กรุณาเลือกผู้ป่วยที่ต้องการนัดหมาย";
+    } elseif ($appointment_date === '' || $appointment_time === '') {
+        $errorMsg = "กรุณาระบุวันและเวลานัดหมายให้ครบถ้วน";
+    } else {
+        // ตรวจสอบว่า appointment_id ซ้ำหรือไม่
+        $checkStmt = $conn->prepare("SELECT appointment_id FROM appointments WHERE appointment_id = ? LIMIT 1");
+        $checkStmt->bind_param("s", $appointment_id);
+        $checkStmt->execute();
+        $checkRes = $checkStmt->get_result();
+
+        if ($checkRes && $checkRes->num_rows > 0) {
+            $errorMsg = "รหัสการนัดหมาย '{$appointment_id}' มีอยู่ในระบบแล้ว กรุณาใช้รหัสอื่น";
+            $checkStmt->close();
+        } else {
+            $checkStmt->close();
+
+            $insertStmt = $conn->prepare("
+                INSERT INTO appointments (appointment_id, user_id, appointment_date, appointment_time, status)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $insertStmt->bind_param("sisss", $appointment_id, $user_id, $appointment_date, $appointment_time, $status);
+
+            if ($insertStmt->execute()) {
+                $insertStmt->close();
+                header("Location: appointment.php?msg=added");
+                exit();
+            } else {
+                $errorMsg = "เกิดข้อผิดพลาดในการบันทึกข้อมูล: " . $conn->error;
+                $insertStmt->close();
+            }
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มตารางนัดหมายใหม่ | Medisync</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Google Font: Prompt -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-primary: #294549;
+            --color-secondary: #4E7F90;
+            --color-teal: #4A807E;
+            --color-mint: #90C2B7;
+            --color-ice: #BBD7DA;
+            --color-white: #FFFFFF;
+            --color-black: #000000;
+
+            --body-bg: #BBD7DA;
+            --text-main: #294549;
+            --text-muted: #537478;
+            --card-bg: #FFFFFF;
+            --card-border: rgba(74, 128, 126, 0.22);
+            --sidebar-width: 270px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--body-bg);
+            background-image: 
+                radial-gradient(circle at 12% 15%, rgba(144, 194, 183, 0.35) 0%, transparent 40%),
+                radial-gradient(circle at 88% 85%, rgba(78, 127, 144, 0.2) 0%, transparent 45%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-size: 14px;
+            min-height: 100vh;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--color-primary) 0%, #1e3336 100%);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1050;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 24px rgba(41, 69, 73, 0.25);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 24px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(187, 215, 218, 0.15);
+        }
+
+        .brand-logo-img {
+            height: 42px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .brand-fallback {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon-box {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--color-mint);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 12px rgba(144, 194, 183, 0.3);
+        }
+
+        .brand-text h4 {
+            font-size: 19px;
+            font-weight: 700;
+            margin: 0;
+            color: var(--color-white);
+            letter-spacing: 0.5px;
+        }
+
+        .brand-text small {
+            display: block;
+            color: var(--color-ice);
+            font-size: 11px;
+            font-weight: 300;
+            margin-top: 2px;
+        }
+
+        .menu-label {
+            color: var(--color-mint);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            padding: 0 12px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 6px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #d7e7e8;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: all 0.22s ease;
+            position: relative;
+        }
+
+        .sidebar-menu a i {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+            color: var(--color-ice);
+            transition: transform 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(78, 127, 144, 0.4);
+            color: var(--color-white);
+            transform: translateX(3px);
+        }
+
+        .sidebar-menu a:hover i {
+            color: var(--color-mint);
+            transform: scale(1.1);
+        }
+
+        .sidebar-menu a.active {
+            background: linear-gradient(90deg, #4E7F90 0%, #3d6a79 100%);
+            color: var(--color-white);
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(41, 69, 73, 0.25);
+        }
+
+        .sidebar-menu a.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 10%;
+            height: 80%;
+            width: 4px;
+            background: var(--color-mint);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .sidebar-menu a.active i {
+            color: var(--color-mint);
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(74, 128, 126, 0.18);
+            padding: 16px 34px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .breadcrumb-nav {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .breadcrumb-nav a {
+            color: var(--color-secondary);
+            font-weight: 500;
+        }
+
+        .content-wrapper {
+            padding: 26px 34px 40px;
+            flex-grow: 1;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 26px rgba(41, 69, 73, 0.07);
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 50%, var(--color-mint) 100%);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(74, 128, 126, 0.15);
+        }
+
+        .form-header-title h4 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-header-title p {
+            color: var(--text-muted);
+            font-size: 12.5px;
+            margin: 4px 0 0;
+        }
+
+        .btn-header-back {
+            background: rgba(78, 127, 144, 0.12);
+            color: var(--color-primary);
+            border: 1px solid rgba(78, 127, 144, 0.3);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-header-back:hover {
+            background: var(--color-secondary);
+            color: var(--color-white);
+        }
+
+        /* Preset Box */
+        .preset-box {
+            background: linear-gradient(135deg, rgba(144, 194, 183, 0.15) 0%, rgba(187, 215, 218, 0.28) 100%);
+            border: 1px dashed var(--color-teal);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 26px;
+        }
+
+        .preset-box-title {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preset-buttons-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .btn-preset-chip {
+            background: #FFFFFF;
+            border: 1px solid rgba(74, 128, 126, 0.3);
+            color: var(--color-primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-preset-chip:hover {
+            background: var(--color-primary);
+            color: var(--color-white);
+            transform: translateY(-2px);
+        }
+
+        /* Form Inputs */
+        .form-group-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .custom-input {
+            width: 100%;
+            border: 1px solid rgba(74, 128, 126, 0.3);
+            border-radius: 12px;
+            padding: 11px 16px;
+            font-family: inherit;
+            font-size: 13px;
+            color: var(--color-primary);
+            background: #FAFCFC;
+            transition: all 0.2s ease;
+        }
+
+        .custom-input:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+            background: #FFFFFF;
+            box-shadow: 0 0 0 3px rgba(78, 127, 144, 0.18);
+        }
+
+        /* Status Radio Pills */
+        .status-radio-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .status-radio-label {
+            flex: 1;
+            min-width: 120px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .status-radio-label input {
+            display: none;
+        }
+
+        .status-pill-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(74, 128, 126, 0.3);
+            background: #FAFCFC;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-primary);
+            transition: all 0.2s ease;
+        }
+
+        .status-radio-label input[value="รอยืนยัน"]:checked + .status-pill-box {
+            background: #FFF3CD;
+            color: #856404;
+            border-color: #ffeeba;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.2);
+        }
+
+        .status-radio-label input[value="ยืนยัน"]:checked + .status-pill-box {
+            background: rgba(144, 194, 183, 0.35);
+            color: #175249;
+            border-color: rgba(144, 194, 183, 0.8);
+            box-shadow: 0 4px 12px rgba(46, 213, 115, 0.2);
+        }
+
+        .status-radio-label input[value="เลื่อน"]:checked + .status-pill-box {
+            background: rgba(78, 127, 144, 0.2);
+            color: var(--color-primary);
+            border-color: var(--color-secondary);
+            box-shadow: 0 4px 12px rgba(78, 127, 144, 0.2);
+        }
+
+        /* Quick Time Chips */
+        .time-chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .chip-time {
+            background: rgba(187, 215, 218, 0.35);
+            border: 1px solid rgba(74, 128, 126, 0.2);
+            color: var(--color-primary);
+            font-size: 11.5px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+
+        .chip-time:hover {
+            background: var(--color-secondary);
+            color: var(--color-white);
+        }
+
+        /* Selected Patient Details Box */
+        .selected-patient-box {
+            background: rgba(187, 215, 218, 0.25);
+            border: 1px solid rgba(74, 128, 126, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-top: 8px;
+            display: none;
+            font-size: 12.5px;
+        }
+
+        /* Form Actions */
+        .form-actions {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(74, 128, 126, 0.15);
+            display: flex;
+            gap: 14px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .btn-submit-save {
+            background: var(--color-primary);
+            color: var(--color-white);
+            font-weight: 600;
+            padding: 12px 28px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(41, 69, 73, 0.25);
+            transition: all 0.22s ease;
+        }
+
+        .btn-submit-save:hover {
+            background: var(--color-secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn-cancel-link {
+            background: rgba(187, 215, 218, 0.35);
+            color: var(--color-primary);
+            border: 1px solid rgba(74, 128, 126, 0.3);
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.22s ease;
+        }
+
+        .btn-cancel-link:hover {
+            background: rgba(187, 215, 218, 0.7);
+            color: var(--color-primary);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid rgba(74, 128, 126, 0.15);
+            background: rgba(255, 255, 255, 0.4);
+            margin-top: auto;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            border: none;
+            background: rgba(78, 127, 144, 0.12);
+            color: var(--color-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .sidebar-overlay.show {
+                display: block;
+                position: fixed;
+                inset: 0;
+                background: rgba(41, 69, 73, 0.55);
+                backdrop-filter: blur(4px);
+                z-index: 1040;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .mobile-menu-btn {
+                display: inline-flex;
+            }
+            .content-wrapper {
+                padding: 20px 16px;
+            }
+            .form-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+    <a href="../index.php" class="sidebar-brand">
+        <img src="../assets/logo.svg"
+             alt="Medisync Logo"
+             class="brand-logo-img"
+             onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='flex';">
+        <div class="brand-fallback" id="brandFallback" style="display: none;">
+            <div class="brand-icon-box">
+                <i class="fa-solid fa-staff-snake"></i>
+            </div>
+            <div class="brand-text">
+                <h4>Medisync</h4>
+                <small>Medicine Management</small>
+            </div>
+        </div>
+    </a>
+
+    <div class="menu-label">เมนูหลัก / NAVIGATION</div>
+
+    <ul class="sidebar-menu">
+        <li>
+            <a href="../index.php">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>หน้าหลัก (Dashboard)</span>
+            </a>
+        </li>
+        <li>
+            <a href="../user-page/user.php">
+                <i class="fa-solid fa-users"></i>
+                <span>ข้อมูลผู้ใช้ (Users)</span>
+            </a>
+        </li>
+        <li>
+            <a href="../medicine-page/medicine.php">
+                <i class="fa-solid fa-pills"></i>
+                <span>รายการยา (Medicines)</span>
+            </a>
+        </li>
+        <li>
+            <a href="appointment.php" class="active">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>การนัดหมาย (Appointments)</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content">
+    <header class="topbar">
+        <div>
+            <div class="breadcrumb-nav">
+                <a href="../index.php">หน้าหลัก</a>
+                <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                <a href="appointment.php">ตารางนัดหมาย</a>
+                <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                <span>เพิ่มการนัดหมายใหม่</span>
+            </div>
+            <h5 class="fw-bold mb-0" style="color: var(--color-primary);">
+                <i class="fa-solid fa-calendar-plus me-2" style="color: var(--color-teal);"></i>
+                แบบฟอร์มเพิ่มการนัดหมายแพทย์
+            </h5>
+        </div>
+
+        <button class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </header>
+
+    <div class="content-wrapper">
+        <div class="form-card">
+
+            <div class="form-header">
+                <div class="form-header-title">
+                    <h4>
+                        <i class="fa-solid fa-calendar-plus" style="color: var(--color-teal);"></i>
+                        บันทึกการนัดหมายใหม่
+                    </h4>
+                    <p>กำหนดวัน เวลา และเลือกผู้ป่วยที่ต้องการนัดหมายตรวจติดตามอาการ</p>
+                </div>
+                <a href="appointment.php" class="btn-header-back">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>กลับไปหน้าตารางนัดหมาย</span>
+                </a>
+            </div>
+
+            <!-- Error Alert -->
+            <?php if (!empty($errorMsg)): ?>
+                <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert" style="border-radius: 12px;">
+                    <i class="fa-solid fa-circle-exclamation fs-5"></i>
+                    <div><?= htmlspecialchars($errorMsg) ?></div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Preset / Shortcut Chips -->
+            <div class="preset-box">
+                <div class="preset-box-title">
+                    <i class="fa-solid fa-wand-magic-sparkles text-primary"></i>
+                    <span>ปุ่มลัดกำหนดเวลานัดหมายด่วน (Presets สำหรับทดสอบ)</span>
+                </div>
+                <div class="preset-buttons-wrap">
+                    <button type="button" class="btn-preset-chip"
+                            onclick="applyPresetDate(0, '09:00', 'ยืนยัน')">
+                        <i class="fa-solid fa-calendar-day text-success"></i>
+                        <span>นัดวันนี้ (09:00 น. - ยืนยัน)</span>
+                    </button>
+
+                    <button type="button" class="btn-preset-chip"
+                            onclick="applyPresetDate(1, '10:30', 'รอยืนยัน')">
+                        <i class="fa-solid fa-calendar-plus text-warning"></i>
+                        <span>นัดพรุ่งนี้ (10:30 น. - รอยืนยัน)</span>
+                    </button>
+
+                    <button type="button" class="btn-preset-chip"
+                            onclick="applyPresetDate(7, '13:15', 'รอยืนยัน')">
+                        <i class="fa-solid fa-calendar-week text-primary"></i>
+                        <span>สัปดาห์หน้า (13:15 น. - รอยืนยัน)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form -->
+            <form method="POST" action="add-appointment.php">
+                <div class="row g-4">
+
+                    <!-- Appointment ID -->
+                    <div class="col-12 col-md-4">
+                        <label class="form-group-label" for="appointment_id">
+                            <i class="fa-solid fa-hashtag text-secondary"></i>
+                            รหัสการนัดหมาย (Appointment ID)
+                        </label>
+                        <input type="text"
+                               id="appointment_id"
+                               name="appointment_id"
+                               class="custom-input"
+                               value="<?= htmlspecialchars($nextAppointmentId) ?>"
+                               required>
+                        <small class="text-muted" style="font-size: 11px;">
+                            * รหัสอ้างอิงนัดหมาย (รูปแบบ ap_X แนะนำอัตโนมัติ)
+                        </small>
+                    </div>
+
+                    <!-- User Selection -->
+                    <div class="col-12 col-md-8">
+                        <label class="form-group-label" for="user_id">
+                            <i class="fa-solid fa-user-injured text-secondary"></i>
+                            เลือกผู้ป่วย / ผู้รับการนัดหมาย
+                        </label>
+                        <select id="user_id"
+                                name="user_id"
+                                class="custom-input"
+                                onchange="onPatientSelected(this)"
+                                required>
+                            <option value="">-- กรุณาเลือกผู้ป่วยในระบบ --</option>
+                            <?php foreach ($usersList as $u): ?>
+                                <option value="<?= $u['user_id'] ?>"
+                                        data-gender="<?= htmlspecialchars($u['gender']) ?>"
+                                        data-disease="<?= htmlspecialchars($u['disease']) ?>"
+                                        data-medicine="<?= htmlspecialchars($u['medicine']) ?>">
+                                    #<?= $u['user_id'] ?> - <?= htmlspecialchars($u['name']) ?> (โรค: <?= htmlspecialchars($u['disease'] ?: 'ไม่ระบุ') ?>)
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <!-- Dynamic Patient Preview Box -->
+                        <div id="patientInfoBox" class="selected-patient-box">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="fa-solid fa-hospital-user text-teal fs-4"></i>
+                                <div>
+                                    <div class="fw-bold" id="patientInfoName"></div>
+                                    <div class="text-muted small">
+                                        โรคประจำตัว: <span id="patientInfoDisease" class="fw-semibold text-dark"></span> &bull; ยาที่ใช้: <span id="patientInfoMedicine" class="fw-semibold text-dark"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Appointment Date -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-group-label" for="appointment_date">
+                            <i class="fa-regular fa-calendar-days text-secondary"></i>
+                            วันที่นัดหมาย (Appointment Date)
+                        </label>
+                        <input type="date"
+                               id="appointment_date"
+                               name="appointment_date"
+                               class="custom-input"
+                               value="<?= date('Y-m-d') ?>"
+                               required>
+                    </div>
+
+                    <!-- Appointment Time -->
+                    <div class="col-12 col-md-6">
+                        <label class="form-group-label" for="appointment_time">
+                            <i class="fa-regular fa-clock text-secondary"></i>
+                            เวลานัดหมาย (Appointment Time)
+                        </label>
+                        <input type="time"
+                               id="appointment_time"
+                               name="appointment_time"
+                               class="custom-input"
+                               value="09:00"
+                               required>
+                        <!-- Quick Time Chips -->
+                        <div class="time-chips-wrap">
+                            <span class="chip-time" onclick="setAppointmentTime('08:30')">08:30 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('09:15')">09:15 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('10:00')">10:00 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('11:30')">11:30 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('13:15')">13:15 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('14:45')">14:45 น.</span>
+                            <span class="chip-time" onclick="setAppointmentTime('15:30')">15:30 น.</span>
+                        </div>
+                    </div>
+
+                    <!-- Status Radio Buttons -->
+                    <div class="col-12">
+                        <label class="form-group-label">
+                            <i class="fa-solid fa-list-check text-secondary"></i>
+                            สถานะการนัดหมาย (Status)
+                        </label>
+                        <div class="status-radio-group">
+                            <label class="status-radio-label">
+                                <input type="radio" name="status" value="รอยืนยัน" checked>
+                                <div class="status-pill-box">
+                                    <i class="fa-solid fa-clock text-warning"></i>
+                                    <span>รอยืนยัน</span>
+                                </div>
+                            </label>
+
+                            <label class="status-radio-label">
+                                <input type="radio" name="status" value="ยืนยัน">
+                                <div class="status-pill-box">
+                                    <i class="fa-solid fa-circle-check text-success"></i>
+                                    <span>ยืนยันแล้ว</span>
+                                </div>
+                            </label>
+
+                            <label class="status-radio-label">
+                                <input type="radio" name="status" value="เลื่อน">
+                                <div class="status-pill-box">
+                                    <i class="fa-solid fa-clock-rotate-left text-secondary"></i>
+                                    <span>เลื่อนนัด</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <a href="appointment.php" class="btn-cancel-link">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>ยกเลิก</span>
+                    </a>
+
+                    <button type="submit" name="submit" class="btn-submit-save">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <span>บันทึกการนัดหมาย</span>
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; <?= date('Y') ?> <strong>Medisync</strong>. Personal Medicine Management System.
+    </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function setAppointmentTime(timeStr) {
+        document.getElementById('appointment_time').value = timeStr;
+    }
+
+    function onPatientSelected(selectElem) {
+        const selectedOpt = selectElem.options[selectElem.selectedIndex];
+        const box = document.getElementById('patientInfoBox');
+
+        if (selectElem.value !== '') {
+            const disease = selectedOpt.getAttribute('data-disease') || 'ไม่ระบุ';
+            const medicine = selectedOpt.getAttribute('data-medicine') || 'ไม่ระบุ';
+            const text = selectedOpt.text;
+
+            document.getElementById('patientInfoName').innerText = text;
+            document.getElementById('patientInfoDisease').innerText = disease;
+            document.getElementById('patientInfoMedicine').innerText = medicine;
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    }
+
+    function applyPresetDate(daysAhead, time, status) {
+        const d = new Date();
+        d.setDate(d.getDate() + daysAhead);
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+
+        document.getElementById('appointment_date').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('appointment_time').value = time;
+
+        const radios = document.getElementsByName('status');
+        for (let r of radios) {
+            if (r.value === status) {
+                r.checked = true;
+                break;
+            }
+        }
+
+        // Auto select first patient if none selected
+        const userSelect = document.getElementById('user_id');
+        if (userSelect && userSelect.selectedIndex === 0 && userSelect.options.length > 1) {
+            userSelect.selectedIndex = 1;
+            onPatientSelected(userSelect);
+        }
+    }
+
+    // Sidebar Mobile Toggle
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const menuBtn = document.getElementById('mobileMenuBtn');
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function () {
+            sidebar.classList.toggle('show');
+            overlay.classList.toggle('show');
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+        });
+    }
+</script>
+
+</body>
+</html>
+

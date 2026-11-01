@@ -1,5 +1,5 @@
 <?php
-    $servername = "db";
+    $servername = "crud_db";
     $username = "user";
     $password = "userpassword";
     $dbname = "medisync";
