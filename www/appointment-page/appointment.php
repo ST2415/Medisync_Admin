@@ -1264,7 +1264,7 @@ $stmt->close();
             <div class="page-heading">
                 <h5>
                     <i class="fa-solid fa-calendar-check" style="color: var(--color-teal);"></i>
-                    ระบบจัดการตารางนัดหมาย (Appointments)
+                    ระบบจัดการตารางนัดหมาย
                 </h5>
                 <p>บันทึก ติดตาม จัดการสถานะ และกำหนดการนัดพบแพทย์ของผู้ป่วย</p>
             </div>

@@ -1285,7 +1285,7 @@ $stmt->close();
             <div class="page-heading">
                 <h5>
                     <i class="fa-solid fa-capsules" style="color: var(--color-teal);"></i>
-                    ระบบจัดการรายการยา (Medicines)
+                    ระบบจัดการรายการยา
                 </h5>
                 <p>ข้อมูลยา สรรพคุณ รูปแบบยา ขนาดยา และข้อควรระวังการใช้งาน</p>
             </div>
