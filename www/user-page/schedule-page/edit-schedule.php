@@ -107,10 +107,22 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
         .brand-container {
             display: flex;
             align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 12px;
             padding: 8px 12px 24px 12px;
             border-bottom: 1px solid rgba(187, 215, 218, 0.18);
             margin-bottom: 24px;
+            text-decoration: none;
+        }
+
+        .brand-logo-img {
+            max-width: 180px;
+            height: auto;
+            max-height: 42px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
         }
 
         .brand-icon {
@@ -536,15 +548,21 @@ $medicines_query = mysqli_query($conn, "SELECT * FROM `medicines`");
 
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
-        <div class="brand-container">
-            <div class="brand-icon">
-                <i class="fa-solid fa-staff-snake"></i>
+        <a href="../../index.php" class="brand-container">
+            <img src="../../assets/logo-medisync.svg"
+                 alt="Medisync Logo"
+                 class="brand-logo-img"
+                 onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='flex';">
+            <div class="brand-fallback" id="brandFallback" style="display: none; align-items: center; justify-content: center; gap: 12px;">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-staff-snake"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Medisync</h1>
+                    <p>Clinic Administration</p>
+                </div>
             </div>
-            <div class="brand-text">
-                <h1>Medisync</h1>
-                <p>Clinic Administration</p>
-            </div>
-        </div>
+        </a>
 
         <div class="nav-label">เมนูหลัก (Navigation)</div>
         <ul class="nav-menu">

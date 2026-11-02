@@ -296,23 +296,28 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
         .sidebar-brand {
             display: flex;
             align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 12px;
             padding: 8px 12px 20px;
             border-bottom: 1px solid rgba(187, 215, 218, 0.15);
             margin-bottom: 20px;
+            text-decoration: none;
         }
 
         .brand-logo-img {
-            max-width: 175px;
+            max-width: 180px;
             height: auto;
-            max-height: 52px;
+            max-height: 42px;
             object-fit: contain;
             display: block;
+            margin: 0 auto;
         }
 
         .brand-fallback {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
         }
 
@@ -1420,7 +1425,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
 
     <!-- Brand -->
     <a href="../index.php" class="sidebar-brand">
-        <img src="../assets/logo.svg"
+        <img src="../assets/logo-medisync.svg"
              alt="Medisync Logo"
              class="brand-logo-img"
              onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='flex';">

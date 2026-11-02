@@ -182,6 +182,8 @@ $stmt->close();
         .sidebar-brand {
             display: flex;
             align-items: center;
+            justify-content: center;
+            text-align: center;
             gap: 12px;
             padding-bottom: 24px;
             margin-bottom: 20px;
@@ -190,14 +192,18 @@ $stmt->close();
         }
 
         .brand-logo-img {
-            height: 42px;
-            width: auto;
+            max-width: 180px;
+            height: auto;
+            max-height: 42px;
             object-fit: contain;
+            display: block;
+            margin: 0 auto;
         }
 
         .brand-fallback {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
         }
 
@@ -1178,7 +1184,7 @@ $stmt->close();
 
     <!-- Brand -->
     <a href="../index.php" class="sidebar-brand">
-        <img src="../assets/logo.svg"
+        <img src="../assets/logo-medisync.svg"
              alt="Medisync Logo"
              class="brand-logo-img"
              onerror="this.style.display='none'; document.getElementById('brandFallback').style.display='flex';">
