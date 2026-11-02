@@ -420,51 +420,94 @@ $stmt->close();
             flex-grow: 1;
         }
 
-        /* ===== PAGE BANNER ===== */
+        /* ===== PAGE HEADER BANNER (HERO STYLE) ===== */
         .page-banner {
+            background: linear-gradient(135deg, #294549 0%, #375b61 50%, #4E7F90 100%);
+            color: var(--color-white);
+            border-radius: 20px;
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(41, 69, 73, 0.16);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 26px;
+            border: 1px solid rgba(187, 215, 218, 0.2);
+        }
+
+        .page-banner::after {
+            content: '';
+            position: absolute;
+            right: -60px;
+            bottom: -60px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(144, 194, 183, 0.22) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .page-banner-title {
+            position: relative;
+            z-index: 1;
         }
 
         .page-banner-title h2 {
             font-size: 24px;
             font-weight: 700;
-            color: var(--color-primary);
-            margin: 0 0 6px 0;
+            color: var(--color-white);
+            margin: 0 0 8px 0;
+            letter-spacing: -0.3px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        .page-banner-title h2 i {
+            color: var(--color-mint) !important;
         }
 
         .page-banner-title p {
-            color: var(--text-muted);
-            margin: 0;
             font-size: 13.5px;
+            color: #dbe8e9;
+            margin: 0;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .hero-action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+            z-index: 1;
+            position: relative;
         }
 
         .btn-add-appointment {
-            background: var(--color-primary);
-            color: var(--color-white);
+            background: var(--color-mint);
+            color: var(--color-primary);
             font-weight: 600;
-            padding: 11px 22px;
+            padding: 10px 20px;
             border-radius: 12px;
-            font-size: 13.5px;
+            font-size: 13px;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.22s ease;
-            box-shadow: 0 4px 14px rgba(41, 69, 73, 0.2);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(144, 194, 183, 0.35);
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            border: none;
         }
 
         .btn-add-appointment:hover {
-            background: var(--color-secondary);
-            color: var(--color-white);
+            background: var(--color-white);
+            color: var(--color-primary);
             transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(41, 69, 73, 0.25);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         /* ===== SUMMARY CARDS ===== */
@@ -1165,7 +1208,10 @@ $stmt->close();
             .page-banner {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 20px;
+                padding: 22px 20px;
             }
+            .hero-action-buttons,
             .btn-add-appointment {
                 width: 100%;
                 justify-content: center;
@@ -1352,16 +1398,18 @@ $stmt->close();
         <section class="page-banner">
             <div class="page-banner-title">
                 <h2>
-                    <i class="fa-solid fa-calendar-days" style="color: var(--color-secondary);"></i>
+                    <i class="fa-solid fa-calendar-days" style="color: var(--color-mint);"></i>
                     ตารางและประวัติการนัดหมายผู้ป่วย
                 </h2>
                 <p>ตรวจสอบ ติดตามสถานะ ยืนยัน เลื่อนนัด หรือจัดการกำหนดการพบแพทย์</p>
             </div>
 
-            <a href="add-appointment.php" class="btn-add-appointment">
-                <i class="fa-solid fa-calendar-plus"></i>
-                <span>เพิ่มการนัดหมายใหม่</span>
-            </a>
+            <div class="hero-action-buttons">
+                <a href="add-appointment.php" class="btn-add-appointment">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    <span>เพิ่มการนัดหมายใหม่</span>
+                </a>
+            </div>
         </section>
 
         <!-- Summary Metric Cards -->
