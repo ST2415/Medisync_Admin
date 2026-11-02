@@ -553,7 +553,195 @@ if(isset($_POST['submit'])){
                 display: inline-flex;
             }
         }
-    </style>
+    
+        /* Sidebar Status Footer Card */
+        .sidebar-footer-card {
+            background: rgba(78, 127, 144, 0.25);
+            border: 1px solid rgba(187, 215, 218, 0.2);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: auto;
+        }
+
+        .system-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--color-mint);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-mint);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-mint);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+
+        /* Admin Profile */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 14px 6px 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(41, 69, 73, 0.05);
+            flex-shrink: 0;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%);
+            color: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(41, 69, 73, 0.2);
+            flex-shrink: 0;
+        }
+
+        .admin-info strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            line-height: 1.2;
+        }
+
+        .admin-info small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 575.98px) {
+            .admin-info {
+                display: none;
+            }
+        }
+
+
+        /* Topbar Actions & Date Badge */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .header-date-badge {
+            background: rgba(187, 215, 218, 0.35);
+            border: 1px solid var(--color-ice);
+            color: var(--color-primary);
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .header-date-badge i {
+            color: var(--color-teal);
+        }
+
+        /* Admin Profile */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 14px 6px 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(41, 69, 73, 0.05);
+            flex-shrink: 0;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%) !important;
+            color: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(41, 69, 73, 0.2);
+            flex-shrink: 0;
+        }
+
+        .admin-info strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            line-height: 1.2;
+        }
+
+        .admin-info small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Sidebar Status Footer Card */
+        .sidebar-footer-card {
+            background: rgba(78, 127, 144, 0.25);
+            border: 1px solid rgba(187, 215, 218, 0.2);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: 20px;
+        }
+
+        .system-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--color-mint);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-mint);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-mint);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        @media (max-width: 575.98px) {
+            .header-date-badge,
+            .admin-info {
+                display: none;
+            }
+        }
+
+</style>
 </head>
 
 <body>
@@ -594,6 +782,19 @@ if(isset($_POST['submit'])){
             </a>
         </li>
     </ul>
+
+        <!-- Sidebar Status Footer -->
+    <div class="sidebar-footer-card">
+        <div class="system-status-indicator">
+            <span class="status-dot"></span>
+            <span>ระบบออนไลน์พร้อมใช้งาน</span>
+        </div>
+        <div style="font-size: 11px; color: var(--color-ice); line-height: 1.5;">
+            Medisync Admin System<br>
+            <span style="opacity: 0.8;">เวอร์ชัน 2.4.0 (Medical-Grade)</span>
+        </div>
+    </div>
+
 </aside>
 
 <!-- Main Content Area -->
@@ -618,6 +819,27 @@ if(isset($_POST['submit'])){
                     <i class="fa-solid fa-user-plus" style="color: var(--color-teal);"></i>
                     เพิ่มข้อมูลผู้ใช้ใหม่ (Add User)
                 </h5>
+            </div>
+        </div>
+
+        <div class="topbar-actions">
+            <!-- Current Date Badge -->
+            <div class="header-date-badge">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span><?= date('d M Y') ?></span>
+                <span style="opacity: 0.5;">|</span>
+                <span id="liveClock"><?= date('H:i') ?></span>
+            </div>
+
+            <!-- Admin Profile -->
+            <div class="admin-profile">
+                <div class="admin-avatar">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="admin-info">
+                    <strong>ผู้ดูแลระบบ</strong>
+                    <small>System Admin</small>
+                </div>
             </div>
         </div>
     </header>
@@ -954,6 +1176,23 @@ if(isset($_POST['submit'])){
             overlay.classList.remove('show');
         });
     }
+</script>
+
+
+<script>
+    // Live Clock Update (Thailand Timezone)
+    function updateClock() {
+        const now = new Date();
+        const bangkokTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+        const hours = String(bangkokTime.getHours()).padStart(2, '0');
+        const minutes = String(bangkokTime.getMinutes()).padStart(2, '0');
+        const clockEl = document.getElementById('liveClock');
+        if (clockEl) {
+            clockEl.textContent = hours + ':' + minutes;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 10000);
 </script>
 
 </body>

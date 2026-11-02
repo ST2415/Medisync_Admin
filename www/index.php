@@ -77,6 +77,7 @@ $sql = "
         a.user_id,
         u.name AS user_name,
         u.gender,
+        u.disease,
         a.appointment_date,
         a.appointment_time,
         a.status
@@ -99,6 +100,7 @@ if ($result) {
             "user_id" => $row['user_id'],
             "name" => $row['user_name'] ?? 'ไม่ระบุชื่อ',
             "gender" => $row['gender'] ?? '-',
+            "disease" => $row['disease'] ?? '',
             "date" => $row['appointment_date'],
             "time" => $row['appointment_time'],
             "status" => $row['status']
@@ -431,10 +433,11 @@ function e($value) {
             box-shadow: 0 2px 8px rgba(41, 69, 73, 0.05);
         }
 
+        
         .admin-avatar {
             width: 38px;
             height: 38px;
-            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%) !important;
             color: var(--color-white);
             border-radius: 50%;
             display: flex;
@@ -442,6 +445,7 @@ function e($value) {
             justify-content: center;
             font-size: 16px;
             box-shadow: 0 2px 6px rgba(41, 69, 73, 0.2);
+            flex-shrink: 0;
         }
 
         .admin-info strong {
@@ -798,7 +802,27 @@ function e($value) {
         .patient-name-text {
             font-weight: 700;
             color: var(--color-primary);
-            font-size: 13px;
+            font-size: 13.5px;
+            display: block;
+        }
+
+        .patient-meta-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 2px;
+        }
+
+        .disease-tag-sm {
+            display: inline-block;
+            background: rgba(74, 128, 126, 0.14);
+            color: #1f4745;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 10.5px;
+            font-weight: 600;
         }
 
         /* Status Badges */
@@ -1092,7 +1116,7 @@ function e($value) {
         </li>
     </ul>
 
-    <!-- Sidebar Status Footer -->
+            <!-- Sidebar Status Footer -->
     <div class="sidebar-footer-card">
         <div class="system-status-indicator">
             <span class="status-dot"></span>
@@ -1151,7 +1175,6 @@ function e($value) {
                 </div>
             </div>
         </div>
-
     </header>
 
     <!-- Page Body Content -->
@@ -1237,8 +1260,9 @@ function e($value) {
                                 <tr>
                                     <th>รหัสนัดหมาย</th>
                                     <th>ข้อมูลผู้ป่วย</th>
-                                    <th>วันที่นัด</th>
-                                    <th>เวลานัด</th>
+                                    <th>โรค / อาการที่วินิจฉัย</th>
+                                    <th>วันที่นัดหมาย</th>
+                                    <th>เวลานัดหมาย</th>
                                     <th>สถานะ</th>
                                 </tr>
                             </thead>
@@ -1278,11 +1302,24 @@ function e($value) {
                                                         <span class="patient-name-text">
                                                             <?= e($appointment['name']) ?>
                                                         </span>
-                                                        <small class="text-muted d-block" style="font-size: 11px;">
-                                                            <?= e($appointment['gender'] ?? '-') ?>
-                                                        </small>
+                                                        <div class="patient-meta-sub">
+                                                            <span>User ID: #<?= e($appointment['user_id']) ?></span>
+                                                            <span>&bull;</span>
+                                                            <span><?= e($appointment['gender'] ?? '-') ?></span>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            </td>
+
+                                            <!-- Disease -->
+                                            <td>
+                                                <?php if (!empty($appointment['disease'])): ?>
+                                                    <span class="disease-tag-sm">
+                                                        <i class="fa-solid fa-stethoscope me-1"></i><?= e($appointment['disease']) ?>
+                                                    </span>
+                                                <?php else: ?>
+                                                    <span class="text-muted">-</span>
+                                                <?php endif; ?>
                                             </td>
 
                                             <!-- Date -->
@@ -1308,7 +1345,7 @@ function e($value) {
                                     <?php endforeach; ?>
                                 <?php else: ?>
                                     <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">
+                                        <td colspan="6" class="text-center py-4 text-muted">
                                             <i class="fa-solid fa-folder-open mb-2 fs-3 text-secondary d-block"></i>
                                             ยังไม่มีรายการนัดหมายในระบบ
                                         </td>
@@ -1334,17 +1371,19 @@ function e($value) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Live Clock Update
+    // Live Clock Update (Thailand Timezone)
     function updateClock() {
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const bangkokTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+        const hours = String(bangkokTime.getHours()).padStart(2, '0');
+        const minutes = String(bangkokTime.getMinutes()).padStart(2, '0');
         const clockEl = document.getElementById('liveClock');
         if (clockEl) {
             clockEl.textContent = hours + ':' + minutes;
         }
     }
-    setInterval(updateClock, 30000);
+    updateClock();
+    setInterval(updateClock, 10000);
 
     // Sidebar Mobile Toggle
     const sidebar = document.getElementById('sidebar');

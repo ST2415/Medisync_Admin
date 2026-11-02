@@ -679,13 +679,13 @@ $stmt->close();
         .filter-select {
             border: 1px solid rgba(74, 128, 126, 0.3);
             border-radius: 12px;
-            padding: 8px 28px 8px 12px;
+            padding: 8px 32px 8px 12px;
             font-family: inherit;
             font-size: 12px;
             background-color: #FAFCFC;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A807E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 11px center;
+            background-position: right 13px center;
             background-size: 11px;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -969,7 +969,7 @@ $stmt->close();
             color: var(--text-muted);
         }
 
-        .empty-state i {
+        .empty-state > i {
             font-size: 44px;
             margin-bottom: 16px;
             color: var(--color-secondary);
@@ -981,6 +981,44 @@ $stmt->close();
             color: var(--color-primary);
             font-size: 16px;
             margin-bottom: 6px;
+        }
+
+        .btn-empty-refresh {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+            background: rgba(74, 128, 126, 0.1);
+            color: var(--color-teal);
+            border: 1.5px solid var(--color-teal);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(74, 128, 126, 0.08);
+            margin-top: 4px;
+        }
+
+        .btn-empty-refresh i {
+            font-size: 12px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: inherit !important;
+            opacity: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        .btn-empty-refresh:hover {
+            background: var(--color-teal);
+            color: var(--color-white);
+            border-color: var(--color-teal);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);
         }
 
         .result-info {
@@ -1238,7 +1276,114 @@ $stmt->close();
                 justify-content: center;
             }
         }
-    </style>
+    
+        /* Topbar Actions & Date Badge */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .header-date-badge {
+            background: rgba(187, 215, 218, 0.35);
+            border: 1px solid var(--color-ice);
+            color: var(--color-primary);
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .header-date-badge i {
+            color: var(--color-teal);
+        }
+
+        /* Admin Profile */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 14px 6px 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(41, 69, 73, 0.05);
+            flex-shrink: 0;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%) !important;
+            color: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(41, 69, 73, 0.2);
+            flex-shrink: 0;
+        }
+
+        .admin-info strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            line-height: 1.2;
+        }
+
+        .admin-info small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Sidebar Status Footer Card */
+        .sidebar-footer-card {
+            background: rgba(78, 127, 144, 0.25);
+            border: 1px solid rgba(187, 215, 218, 0.2);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: 20px;
+        }
+
+        .system-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--color-mint);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-mint);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-mint);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        @media (max-width: 575.98px) {
+            .header-date-badge,
+            .admin-info {
+                display: none;
+            }
+        }
+
+</style>
 </head>
 
 <body>
@@ -1299,15 +1444,15 @@ $stmt->close();
         </li>
     </ul>
 
-    <!-- Sidebar Status Footer -->
+            <!-- Sidebar Status Footer -->
     <div class="sidebar-footer-card">
         <div class="system-status-indicator">
             <span class="status-dot"></span>
             <span>ระบบออนไลน์พร้อมใช้งาน</span>
         </div>
         <div style="font-size: 11px; color: var(--color-ice); line-height: 1.5;">
-            Medisync Admin Panel<br>
-            <span style="opacity: 0.8;">คลังรายการยา & เภสัชกรรม</span>
+            Medisync Admin System<br>
+            <span style="opacity: 0.8;">เวอร์ชัน 2.4.0 (Medical-Grade)</span>
         </div>
     </div>
 
@@ -1337,13 +1482,24 @@ $stmt->close();
             </div>
         </div>
 
-        <div class="admin-profile">
-            <div class="admin-avatar">
-                <i class="fa-solid fa-prescription-bottle-medical"></i>
+        <div class="topbar-actions">
+            <!-- Current Date Badge -->
+            <div class="header-date-badge">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span><?= date('d M Y') ?></span>
+                <span style="opacity: 0.5;">|</span>
+                <span id="liveClock"><?= date('H:i') ?></span>
             </div>
-            <div class="admin-info">
-                <strong>ผู้ดูแลระบบ</strong>
-                <small>Pharmacy Admin</small>
+
+            <!-- Admin Profile -->
+            <div class="admin-profile">
+                <div class="admin-avatar">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="admin-info">
+                    <strong>ผู้ดูแลระบบ</strong>
+                    <small>System Admin</small>
+                </div>
             </div>
         </div>
     </header>
@@ -1685,8 +1841,9 @@ $stmt->close();
                                         <?= ($search !== '' || $filterForm !== '') ? 'ไม่มีข้อมูลที่ตรงกับเงื่อนไขการค้นหา' : 'ยังไม่มีข้อมูลยาในระบบ' ?>
                                     </p>
                                     <?php if ($search !== '' || $filterForm !== ''): ?>
-                                        <a href="medicine.php" class="btn btn-sm btn-outline-primary" style="border-radius: 20px;">
-                                            <i class="fa-solid fa-rotate-left me-1"></i> ดูรายการยาทั้งหมด
+                                        <a href="medicine.php" class="btn-empty-refresh">
+                                            <i class="fa-solid fa-arrows-rotate"></i>
+                                            <span>ดูรายการยาทั้งหมด</span>
                                         </a>
                                     <?php endif; ?>
                                 </td>
@@ -1926,6 +2083,23 @@ $stmt->close();
         const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
         modal.show();
     }
+</script>
+
+
+<script>
+    // Live Clock Update (Thailand Timezone)
+    function updateClock() {
+        const now = new Date();
+        const bangkokTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+        const hours = String(bangkokTime.getHours()).padStart(2, '0');
+        const minutes = String(bangkokTime.getMinutes()).padStart(2, '0');
+        const clockEl = document.getElementById('liveClock');
+        if (clockEl) {
+            clockEl.textContent = hours + ':' + minutes;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 10000);
 </script>
 
 </body>

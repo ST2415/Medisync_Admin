@@ -925,6 +925,18 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             transition: all 0.2s ease;
         }
 
+        select.filter-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A807E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+            background-size: 11px;
+            padding-right: 32px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            cursor: pointer;
+        }
+
         .filter-input:focus {
             outline: none;
             border-color: var(--color-secondary);
@@ -1234,7 +1246,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             color: var(--text-muted);
         }
 
-        .empty-box i {
+        .empty-box > i {
             font-size: 44px;
             color: var(--color-secondary);
             opacity: 0.5;
@@ -1246,6 +1258,44 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             color: var(--color-primary);
             font-size: 16px;
             margin-bottom: 6px;
+        }
+
+        .btn-empty-refresh {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 20px;
+            background: rgba(74, 128, 126, 0.1);
+            color: var(--color-teal);
+            border: 1.5px solid var(--color-teal);
+            text-decoration: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 6px rgba(74, 128, 126, 0.08);
+            margin-top: 4px;
+        }
+
+        .btn-empty-refresh i {
+            font-size: 12px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: inherit !important;
+            opacity: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+        }
+
+        .btn-empty-refresh:hover {
+            background: var(--color-teal);
+            color: var(--color-white);
+            border-color: var(--color-teal);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);
         }
 
         /* ===== FOOTER ===== */
@@ -1412,7 +1462,114 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                 transform: translateY(0) scale(1);
             }
         }
-    </style>
+    
+        /* Topbar Actions & Date Badge */
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .header-date-badge {
+            background: rgba(187, 215, 218, 0.35);
+            border: 1px solid var(--color-ice);
+            color: var(--color-primary);
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .header-date-badge i {
+            color: var(--color-teal);
+        }
+
+        /* Admin Profile */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 14px 6px 8px;
+            background: #FFFFFF;
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(41, 69, 73, 0.05);
+            flex-shrink: 0;
+        }
+
+        .admin-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-teal) 100%) !important;
+            color: var(--color-white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 2px 6px rgba(41, 69, 73, 0.2);
+            flex-shrink: 0;
+        }
+
+        .admin-info strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-primary);
+            line-height: 1.2;
+        }
+
+        .admin-info small {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        /* Sidebar Status Footer Card */
+        .sidebar-footer-card {
+            background: rgba(78, 127, 144, 0.25);
+            border: 1px solid rgba(187, 215, 218, 0.2);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-top: 20px;
+        }
+
+        .system-status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--color-mint);
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-mint);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--color-mint);
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        @media (max-width: 575.98px) {
+            .header-date-badge,
+            .admin-info {
+                display: none;
+            }
+        }
+
+</style>
 </head>
 
 <body>
@@ -1473,15 +1630,15 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
         </li>
     </ul>
 
-    <!-- Sidebar Status Footer -->
+            <!-- Sidebar Status Footer -->
     <div class="sidebar-footer-card">
         <div class="system-status-indicator">
             <span class="status-dot"></span>
             <span>ระบบออนไลน์พร้อมใช้งาน</span>
         </div>
         <div style="font-size: 11px; color: var(--color-ice); line-height: 1.5;">
-            Medisync Patient Overview<br>
-            <span style="opacity: 0.8;">แฟ้มประวัติสุขภาพผู้ป่วย</span>
+            Medisync Admin System<br>
+            <span style="opacity: 0.8;">เวอร์ชัน 2.4.0 (Medical-Grade)</span>
         </div>
     </div>
 
@@ -1517,13 +1674,24 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             </div>
         </div>
 
-        <div class="admin-profile">
-            <div class="admin-avatar">
-                <i class="fa-solid fa-user-doctor"></i>
+        <div class="topbar-actions">
+            <!-- Current Date Badge -->
+            <div class="header-date-badge">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span><?= date('d M Y') ?></span>
+                <span style="opacity: 0.5;">|</span>
+                <span id="liveClock"><?= date('H:i') ?></span>
             </div>
-            <div class="admin-info">
-                <strong>ผู้ดูแลระบบ</strong>
-                <small>System Admin</small>
+
+            <!-- Admin Profile -->
+            <div class="admin-profile">
+                <div class="admin-avatar">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="admin-info">
+                    <strong>ผู้ดูแลระบบ</strong>
+                    <small>System Admin</small>
+                </div>
             </div>
         </div>
     </header>
@@ -1815,7 +1983,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                     </button>
                                     <?php if ($schedSearch !== '' || ($schedTime !== '' && $schedTime !== 'all')): ?>
                                         <a href="?id=<?= urlencode($userId) ?>&tab=schedules" class="btn-filter-reset">
-                                            <i class="fa-solid fa-rotate-left"></i>
+                                            <i class="fa-solid fa-xmark"></i>
                                             <span>ล้าง</span>
                                         </a>
                                     <?php endif; ?>
@@ -1926,6 +2094,14 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                 <i class="fa-solid fa-calendar-xmark d-block"></i>
                                 <h6>ไม่พบรายการยาตามเงื่อนไขที่กำหนด</h6>
                                 <p>ผู้ป่วยรายนี้ยังไม่มีรายการยาในตารางเวลา หรือไม่มีรายการที่ตรงกับคำค้นหา</p>
+                                <?php if ($schedSearch !== '' || ($schedTime !== '' && $schedTime !== 'all')): ?>
+                                    <div class="mt-3">
+                                        <a href="?id=<?= urlencode($userId) ?>&tab=schedules" class="btn-empty-refresh">
+                                            <i class="fa-solid fa-arrows-rotate"></i>
+                                            <span>ล้างตัวกรองและดูทั้งหมด</span>
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -2010,7 +2186,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                     </button>
                                     <?php if ($logSearch !== '' || ($logStatus !== '' && $logStatus !== 'all') || ($logTime !== '' && $logTime !== 'all') || $logDateFrom !== '' || $logDateTo !== ''): ?>
                                         <a href="?id=<?= urlencode($userId) ?>&tab=logs" class="btn-filter-reset">
-                                            <i class="fa-solid fa-rotate-left"></i>
+                                            <i class="fa-solid fa-xmark"></i>
                                             <span>ล้าง</span>
                                         </a>
                                     <?php endif; ?>
@@ -2138,6 +2314,14 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                 <i class="fa-solid fa-clipboard-question d-block"></i>
                                 <h6>ไม่พบประวัติการรับประทานยาตามเงื่อนไข</h6>
                                 <p>ยังไม่มีบันทึกประวัติการทานยา หรือไม่มีข้อมูลตรงกับตัวกรองที่เลือก</p>
+                                <?php if ($logSearch !== '' || ($logStatus !== '' && $logStatus !== 'all') || ($logTime !== '' && $logTime !== 'all') || $logDateFrom !== '' || $logDateTo !== ''): ?>
+                                    <div class="mt-3">
+                                        <a href="?id=<?= urlencode($userId) ?>&tab=logs" class="btn-empty-refresh">
+                                            <i class="fa-solid fa-arrows-rotate"></i>
+                                            <span>ล้างตัวกรองและดูทั้งหมด</span>
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -2187,6 +2371,23 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             }
         });
     });
+</script>
+
+
+<script>
+    // Live Clock Update (Thailand Timezone)
+    function updateClock() {
+        const now = new Date();
+        const bangkokTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+        const hours = String(bangkokTime.getHours()).padStart(2, '0');
+        const minutes = String(bangkokTime.getMinutes()).padStart(2, '0');
+        const clockEl = document.getElementById('liveClock');
+        if (clockEl) {
+            clockEl.textContent = hours + ':' + minutes;
+        }
+    }
+    updateClock();
+    setInterval(updateClock, 10000);
 </script>
 
 </body>

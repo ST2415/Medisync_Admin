@@ -1,4 +1,5 @@
 <?php
+    date_default_timezone_set('Asia/Bangkok');
     $servername = "crud_db";
     $username = "user";
     $password = "userpassword";
