@@ -580,15 +580,17 @@ $stmt->close();
         .filter-controls-wrap {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .search-container {
             display: flex;
             gap: 8px;
-            width: 100%;
-            max-width: 360px;
+            width: auto;
+            min-width: 170px;
+            max-width: 240px;
+            flex: 1 1 auto;
         }
 
         .search-input-wrapper {
@@ -598,7 +600,7 @@ $stmt->close();
 
         .search-input-wrapper i {
             position: absolute;
-            left: 14px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--color-secondary);
@@ -609,9 +611,9 @@ $stmt->close();
             width: 100%;
             border: 1px solid rgba(74, 128, 126, 0.3);
             border-radius: 12px;
-            padding: 10px 14px 10px 36px;
+            padding: 8px 12px 8px 34px;
             font-family: inherit;
-            font-size: 12.5px;
+            font-size: 12px;
             background: #FAFCFC;
             color: var(--color-primary);
             transition: all 0.2s ease;
@@ -627,13 +629,13 @@ $stmt->close();
         .filter-select {
             border: 1px solid rgba(74, 128, 126, 0.3);
             border-radius: 12px;
-            padding: 10px 32px 10px 14px;
+            padding: 8px 28px 8px 12px;
             font-family: inherit;
-            font-size: 12.5px;
+            font-size: 12px;
             background-color: #FAFCFC;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234A807E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 12px center;
+            background-position: right 11px center;
             background-size: 11px;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -641,12 +643,25 @@ $stmt->close();
             color: var(--color-primary);
             cursor: pointer;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .filter-select[name="status"] {
+            min-width: 105px;
+            max-width: 120px;
+        }
+
+        .filter-select[name="date_filter"] {
+            min-width: 125px;
+            max-width: 165px;
+            text-overflow: ellipsis;
         }
 
         .filter-select:focus {
             outline: none;
             border-color: var(--color-secondary);
-            background: #FFFFFF;
+            background-color: #FFFFFF;
         }
 
         .btn-search {
@@ -654,8 +669,8 @@ $stmt->close();
             color: var(--color-white);
             border: none;
             border-radius: 12px;
-            padding: 10px 18px;
-            font-size: 12.5px;
+            padding: 8px 14px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -663,6 +678,7 @@ $stmt->close();
             align-items: center;
             gap: 6px;
             white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .btn-search:hover {
@@ -675,12 +691,15 @@ $stmt->close();
             color: var(--color-primary);
             background: rgba(187, 215, 218, 0.25);
             border-radius: 12px;
-            padding: 10px 14px;
-            font-size: 13px;
+            padding: 8px 11px;
+            font-size: 12px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+            text-decoration: none;
         }
 
         .btn-reset:hover {
@@ -1116,8 +1135,17 @@ $stmt->close();
             .content-wrapper {
                 padding: 20px 18px;
             }
+            .filter-controls-wrap {
+                width: 100%;
+                overflow-x: auto;
+                padding-bottom: 4px;
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
             .search-container {
-                max-width: 100%;
+                min-width: 170px;
+                max-width: 240px;
             }
         }
 
@@ -1465,6 +1493,7 @@ $stmt->close();
                     </select>
 
                     <button type="submit" class="btn-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
                         <span>ค้นหา</span>
                     </button>
 
