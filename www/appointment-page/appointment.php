@@ -488,7 +488,7 @@ $stmt->close();
             background: var(--color-mint);
             color: var(--color-primary);
             font-weight: 600;
-            padding: 10px 20px;
+            padding: 9px 18px;
             border-radius: 12px;
             font-size: 13px;
             display: inline-flex;
@@ -500,7 +500,15 @@ $stmt->close();
             position: relative;
             z-index: 1;
             flex-shrink: 0;
+            white-space: nowrap;
             border: none;
+        }
+
+        .panel-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-add-appointment:hover {
@@ -1550,24 +1558,6 @@ $stmt->close();
             <?php endif; ?>
         <?php endif; ?>
 
-        <!-- Page Header Banner -->
-        <section class="page-banner">
-            <div class="page-banner-title">
-                <h2>
-                    <i class="fa-solid fa-calendar-days" style="color: var(--color-mint);"></i>
-                    ตารางและประวัติการนัดหมายผู้ป่วย
-                </h2>
-                <p>ตรวจสอบ ติดตามสถานะ ยืนยัน เลื่อนนัด หรือจัดการกำหนดการพบแพทย์</p>
-            </div>
-
-            <div class="hero-action-buttons">
-                <a href="add-appointment.php" class="btn-add-appointment">
-                    <i class="fa-solid fa-calendar-plus"></i>
-                    <span>เพิ่มการนัดหมายใหม่</span>
-                </a>
-            </div>
-        </section>
-
         <!-- Summary Metric Cards -->
         <section class="row g-3 mb-4">
 
@@ -1673,46 +1663,53 @@ $stmt->close();
                     <p>แสดงวัน เวลา ข้อมูลผู้ป่วย และสถานะการนัดหมายทั้งหมด</p>
                 </div>
 
-                <!-- Search & Filters -->
-                <form method="GET" action="appointment.php" class="filter-controls-wrap">
-                    <div class="search-container">
-                        <div class="search-input-wrapper">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="ค้นหา รหัสนัดหมาย, ชื่อผู้ป่วย, โรค..."
-                                value="<?= e($search) ?>"
-                            >
+                <div class="panel-header-actions">
+                    <!-- Search & Filters -->
+                    <form method="GET" action="appointment.php" class="filter-controls-wrap">
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="ค้นหา รหัสนัดหมาย, ชื่อผู้ป่วย, โรค..."
+                                    value="<?= e($search) ?>"
+                                >
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Status Filter -->
-                    <select name="status" class="filter-select" onchange="this.form.submit()">
-                        <option value="">-- ทุกสถานะ --</option>
-                        <option value="ยืนยัน" <?= $filterStatus === 'ยืนยัน' ? 'selected' : '' ?>>ยืนยันแล้ว</option>
-                        <option value="รอยืนยัน" <?= $filterStatus === 'รอยืนยัน' ? 'selected' : '' ?>>รอยืนยัน</option>
-                        <option value="เลื่อน" <?= $filterStatus === 'เลื่อน' ? 'selected' : '' ?>>เลื่อนนัด</option>
-                    </select>
+                        <!-- Status Filter -->
+                        <select name="status" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- ทุกสถานะ --</option>
+                            <option value="ยืนยัน" <?= $filterStatus === 'ยืนยัน' ? 'selected' : '' ?>>ยืนยันแล้ว</option>
+                            <option value="รอยืนยัน" <?= $filterStatus === 'รอยืนยัน' ? 'selected' : '' ?>>รอยืนยัน</option>
+                            <option value="เลื่อน" <?= $filterStatus === 'เลื่อน' ? 'selected' : '' ?>>เลื่อนนัด</option>
+                        </select>
 
-                    <!-- Date Filter -->
-                    <select name="date_filter" class="filter-select" onchange="this.form.submit()">
-                        <option value="">-- ทุกช่วงเวลา --</option>
-                        <option value="today" <?= $filterDate === 'today' ? 'selected' : '' ?>>นัดหมายวันนี้</option>
-                        <option value="upcoming" <?= $filterDate === 'upcoming' ? 'selected' : '' ?>>นัดหมายตั้งแต่วันนี้เป็นต้นไป</option>
-                    </select>
+                        <!-- Date Filter -->
+                        <select name="date_filter" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- ทุกช่วงเวลา --</option>
+                            <option value="today" <?= $filterDate === 'today' ? 'selected' : '' ?>>นัดหมายวันนี้</option>
+                            <option value="upcoming" <?= $filterDate === 'upcoming' ? 'selected' : '' ?>>นัดหมายตั้งแต่วันนี้เป็นต้นไป</option>
+                        </select>
 
-                    <button type="submit" class="btn-search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>ค้นหา</span>
-                    </button>
+                        <button type="submit" class="btn-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>ค้นหา</span>
+                        </button>
 
-                    <?php if ($search !== '' || $filterStatus !== '' || $filterDate !== ''): ?>
-                        <a href="appointment.php" class="btn-reset" title="ล้างการค้นหา">
-                            <i class="fa-solid fa-xmark"></i>
-                        </a>
-                    <?php endif; ?>
-                </form>
+                        <?php if ($search !== '' || $filterStatus !== '' || $filterDate !== ''): ?>
+                            <a href="appointment.php" class="btn-reset" title="ล้างการค้นหา">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                        <?php endif; ?>
+                    </form>
+
+                    <a href="add-appointment.php" class="btn-add-appointment">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        <span>เพิ่มการนัดหมายใหม่</span>
+                    </a>
+                </div>
             </div>
 
             <!-- Responsive Table -->

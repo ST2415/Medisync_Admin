@@ -1053,7 +1053,7 @@ if (isset($_POST['submit'])) {
                         <i class="fa-solid fa-plus-circle" style="color: var(--color-teal);"></i>
                         บันทึกรายการยาใหม่เข้าสู่ระบบ
                     </h4>
-                    <p>กรอกข้อมูลตัวยาสำคัญ ความแรง รูปแบบ สรรพคุณ และคำแนะนำการใช้ยา</p>
+                    <p>กรอกข้อมูลตัวยาสำคัญ ปริมาณ รูปแบบ สรรพคุณ และคำแนะนำการใช้ยา</p>
                 </div>
                 <a href="medicine.php" class="btn-header-back">
                     <i class="fa-solid fa-arrow-left"></i>
@@ -1165,7 +1165,7 @@ if (isset($_POST['submit'])) {
                     <div class="col-12 col-md-5">
                         <label class="form-group-label" for="strength">
                             <i class="fa-solid fa-bolt text-secondary"></i>
-                            ความแรง / ขนาดยา (Strength)
+                            ปริมาณ / ขนาดยา (Strength)
                         </label>
                         <input type="text"
                                id="strength"

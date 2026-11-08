@@ -1180,31 +1180,6 @@ function e($value) {
     <!-- Page Body Content -->
     <div class="content-wrapper">
 
-        <!-- Welcome Hero Section -->
-        <section class="welcome-hero">
-            <div class="welcome-text">
-                <h2>
-                    <i class="fa-solid fa-heart-pulse me-2" style="color: var(--color-mint);"></i>
-                    ยินดีต้อนรับกลับสู่ระบบ Medisync!
-                </h2>
-                <p>
-                    ระบบบริหารจัดการยาและประวัติการดูแลผู้ป่วย ติดตามสถิติการจ่ายยา การนัดหมายแพทย์
-                    และบันทึกการรับประทานยาได้อย่างสะดวก ถูกต้อง และปลอดภัย
-                </p>
-            </div>
-
-            <div class="hero-action-buttons">
-                <a href="user-page/user.php" class="btn-hero-primary">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>จัดการผู้ใช้</span>
-                </a>
-                <a href="appointment-page/appointment.php" class="btn-hero-outline">
-                    <i class="fa-solid fa-calendar-days"></i>
-                    <span>ตรวจการนัดหมาย</span>
-                </a>
-            </div>
-        </section>
-
         <!-- Summary Cards Grid -->
         <section class="row g-3 mb-4">
             <?php foreach ($stats as $stat): ?>

@@ -489,7 +489,7 @@ $stmt->close();
             background: var(--color-mint);
             color: var(--color-primary);
             font-weight: 600;
-            padding: 10px 20px;
+            padding: 9px 18px;
             border-radius: 12px;
             font-size: 13px;
             display: inline-flex;
@@ -501,7 +501,15 @@ $stmt->close();
             position: relative;
             z-index: 1;
             flex-shrink: 0;
+            white-space: nowrap;
             border: none;
+        }
+
+        .panel-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-add-medicine:hover {
@@ -1572,24 +1580,6 @@ $stmt->close();
             <?php endif; ?>
         <?php endif; ?>
 
-        <!-- Page Header Banner -->
-        <section class="page-banner">
-            <div class="page-banner-title">
-                <h2>
-                    <i class="fa-solid fa-pills" style="color: var(--color-mint);"></i>
-                    คลังข้อมูลเวชภัณฑ์และรายการยา
-                </h2>
-                <p>บันทึก ค้นหา แก้ไข และจัดการรายการยาทั้งหมดในระบบ Medisync</p>
-            </div>
-
-            <div class="hero-action-buttons">
-                <a href="add-medicine.php" class="btn-add-medicine">
-                    <i class="fa-solid fa-plus-circle"></i>
-                    <span>เพิ่มยาใหม่</span>
-                </a>
-            </div>
-        </section>
-
         <!-- Summary Metric Cards -->
         <section class="row g-3 mb-4">
 
@@ -1670,44 +1660,51 @@ $stmt->close();
                         <i class="fa-solid fa-list-check" style="color: var(--color-secondary);"></i>
                         ตารางรายการยาในระบบ
                     </h5>
-                    <p>แสดงรายละเอียดตัวยาสำคัญ ความแรง รูปแบบ สรรพคุณ และการจัดการ</p>
+                    <p>แสดงรายละเอียดตัวยาสำคัญ ปริมาณ รูปแบบ สรรพคุณ และการจัดการ</p>
                 </div>
 
-                <!-- Search & Filters -->
-                <form method="GET" action="medicine.php" class="filter-controls-wrap">
-                    <div class="search-container">
-                        <div class="search-input-wrapper">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                            <input
-                                type="text"
-                                name="search"
-                                placeholder="ค้นหา TPU, ชื่อยา, ตัวยาสำคัญ, สรรพคุณ..."
-                                value="<?= e($search) ?>"
-                            >
+                <div class="panel-header-actions">
+                    <!-- Search & Filters -->
+                    <form method="GET" action="medicine.php" class="filter-controls-wrap">
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input
+                                    type="text"
+                                    name="search"
+                                    placeholder="ค้นหา TPU, ชื่อยา, ตัวยาสำคัญ, สรรพคุณ..."
+                                    value="<?= e($search) ?>"
+                                >
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Dosage Form Filter -->
-                    <select name="dosageform" class="filter-select" onchange="this.form.submit()">
-                        <option value="">-- ทุกรูปแบบยา --</option>
-                        <?php foreach ($dosageFormsList as $dform): ?>
-                            <option value="<?= e($dform) ?>" <?= $filterForm === $dform ? 'selected' : '' ?>>
-                                <?= e($dform) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                        <!-- Dosage Form Filter -->
+                        <select name="dosageform" class="filter-select" onchange="this.form.submit()">
+                            <option value="">-- ทุกรูปแบบยา --</option>
+                            <?php foreach ($dosageFormsList as $dform): ?>
+                                <option value="<?= e($dform) ?>" <?= $filterForm === $dform ? 'selected' : '' ?>>
+                                    <?= e($dform) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <button type="submit" class="btn-search">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <span>ค้นหา</span>
-                    </button>
+                        <button type="submit" class="btn-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <span>ค้นหา</span>
+                        </button>
 
-                    <?php if ($search !== '' || $filterForm !== ''): ?>
-                        <a href="medicine.php" class="btn-reset" title="ล้างการค้นหา">
-                            <i class="fa-solid fa-xmark"></i>
-                        </a>
-                    <?php endif; ?>
-                </form>
+                        <?php if ($search !== '' || $filterForm !== ''): ?>
+                            <a href="medicine.php" class="btn-reset" title="ล้างการค้นหา">
+                                <i class="fa-solid fa-xmark"></i>
+                            </a>
+                        <?php endif; ?>
+                    </form>
+
+                    <a href="add-medicine.php" class="btn-add-medicine">
+                        <i class="fa-solid fa-plus-circle"></i>
+                        <span>เพิ่มยาใหม่</span>
+                    </a>
+                </div>
             </div>
 
             <!-- Responsive Table -->
@@ -1717,7 +1714,7 @@ $stmt->close();
                         <tr>
                             <th>รหัส TPU</th>
                             <th>รูปยา / ข้อมูลยา</th>
-                            <th>ตัวยาสำคัญ & ความแรง</th>
+                            <th>ตัวยาสำคัญ & ปริมาณ</th>
                             <th>รูปแบบยา</th>
                             <th>ข้อบ่งใช้ / สรรพคุณ</th>
                             <th>ผลข้างเคียง & ข้อควรระวัง</th>
@@ -1919,7 +1916,7 @@ $stmt->close();
 
                         <div class="row g-2 mb-3">
                             <div class="col-6">
-                                <label class="text-muted small fw-semibold">ความแรง (Strength)</label>
+                                <label class="text-muted small fw-semibold">ปริมาณ (Strength)</label>
                                 <div id="modalStrength" class="fw-bold text-dark"></div>
                             </div>
                             <div class="col-6">

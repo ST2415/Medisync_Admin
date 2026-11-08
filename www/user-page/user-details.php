@@ -2046,7 +2046,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                                 <!-- Detail Specs -->
                                                 <ul class="med-details-list">
                                                     <li>
-                                                        <strong>ความแรง:</strong>
+                                                        <strong>ปริมาณ:</strong>
                                                         <span><?= !empty($sched['strength']) ? e($sched['strength']) : '-' ?></span>
                                                     </li>
                                                     <li>

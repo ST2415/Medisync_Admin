@@ -1123,7 +1123,7 @@ if (isset($_POST['submit'])) {
                     <div class="col-12 col-md-5">
                         <label class="form-group-label" for="strength">
                             <i class="fa-solid fa-bolt text-secondary"></i>
-                            ความแรง / ขนาดยา (Strength)
+                            ปริมาณ / ขนาดยา (Strength)
                         </label>
                         <input type="text"
                                id="strength"
