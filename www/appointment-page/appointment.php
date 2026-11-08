@@ -512,10 +512,14 @@ $stmt->close();
         }
 
         .btn-add-appointment:hover {
-            background: var(--color-white);
-            color: var(--color-primary);
+            background: var(--color-primary);
+            color: var(--color-white) !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 18px rgba(41, 69, 73, 0.3);
+        }
+
+        .btn-add-appointment:hover i {
+            color: var(--color-white) !important;
         }
 
         /* ===== SUMMARY CARDS ===== */

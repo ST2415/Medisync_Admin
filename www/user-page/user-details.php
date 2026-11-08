@@ -1021,6 +1021,32 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
             background: var(--color-secondary);
         }
 
+        .btn-add-action {
+            background: var(--color-mint);
+            color: var(--color-primary);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(144, 194, 183, 0.35);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add-action:hover {
+            background: var(--color-primary);
+            color: var(--color-white) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(41, 69, 73, 0.3);
+        }
+
+        .btn-add-action:hover i {
+            color: var(--color-white) !important;
+        }
+
         .btn-filter-reset {
             background: rgba(187, 215, 218, 0.35);
             color: var(--color-primary);
@@ -1990,7 +2016,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                 </div>
 
                                 <div class="ms-auto">
-                                    <a href="schedule-page/add-schedule.php?user_id=<?= urlencode($userId) ?>" style="background: var(--color-teal); color: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);">
+                                    <a href="schedule-page/add-schedule.php?user_id=<?= urlencode($userId) ?>" class="btn-add-action">
                                         <i class="fa-solid fa-plus"></i>
                                         <span>เพิ่มตารางยา</span>
                                     </a>
@@ -2193,7 +2219,7 @@ $adherenceRate = ($totalLogsCount > 0) ? round(($countTaken / $totalLogsCount) *
                                 </div>
 
                                 <div class="ms-auto">
-                                    <a href="medication-log-page/add-medication-log.php?user_id=<?= urlencode($userId) ?>" style="background: var(--color-teal); color: #fff; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(74, 128, 126, 0.25);">
+                                    <a href="medication-log-page/add-medication-log.php?user_id=<?= urlencode($userId) ?>" class="btn-add-action">
                                         <i class="fa-solid fa-plus"></i>
                                         <span>บันทึกการกินยา</span>
                                     </a>
